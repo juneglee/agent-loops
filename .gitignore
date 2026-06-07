@@ -219,6 +219,8 @@ __marimo__/
 
 
 # project
+models/
 /docs/
 /notes/
+results/traces/
 .DS_Store
