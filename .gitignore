@@ -222,5 +222,7 @@ __marimo__/
 models/
 /docs/
 /notes/
+data/tasks/generic_v1/
+data/tasks/private/
 results/traces/
 .DS_Store
