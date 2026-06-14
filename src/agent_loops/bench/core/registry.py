@@ -4,7 +4,11 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
-LOOPS: dict[str, Any] = {}
+from agent_loops.loops import (
+    single_call,
+)
+
+LOOPS = {m.NAME: m for m in (single_call,)}
 
 LOOP_KWARGS = {}
 

@@ -9,7 +9,9 @@ SYSTEM = (
     "Pick the tool that does the job and call it. Do not just describe what to do."
 )
 
-LOOP_INSTRUCTIONS: dict[str, str] = {}
+LOOP_INSTRUCTIONS: dict[str, str] = {
+    "single_call": ("Call the tool that carries out the request **once**."),
+}
 
 INSTRUCTION_VARIANTS: dict[str, dict[str, str]] = {
     "no-empty-plan": {
