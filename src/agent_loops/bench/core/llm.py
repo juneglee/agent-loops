@@ -137,6 +137,7 @@ def call(
             "text": "",
             "parse_ok": False,
             "quiet_failure": False,
+            "truncated": False,
             "raw": None,
             "error": f"{type(exc).__name__}: {exc}",
         }
