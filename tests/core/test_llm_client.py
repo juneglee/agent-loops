@@ -1,6 +1,6 @@
 import pytest
 
-from agent_loops.bench.core.llm import RUNTIMES, build_payload, parse_response
+from agent_loops.bench.core.llm import RUNTIMES, build_payload, call, parse_response
 
 
 def test_parses_tool_call_from_openai_response():
@@ -137,3 +137,15 @@ def test_build_payload_carries_seed_through_extra():
         runtime="llamacpp", model="m", messages=[], tools=None, seed=42
     )
     assert payload["seed"] == 42
+
+
+def test_transport_error_returns_the_same_keys_as_a_parsed_response(monkeypatch):
+    import requests
+
+    def boom(*args, **kwargs):
+        raise requests.ConnectionError("down")
+
+    monkeypatch.setattr(requests, "post", boom)
+    out = call(messages=[{"role": "user", "content": "hi"}])
+    assert out["parse_ok"] is False and out["error"].startswith("ConnectionError")
+    assert set(out) >= set(parse_response({}))
