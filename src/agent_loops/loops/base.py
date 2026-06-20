@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -35,3 +36,30 @@ class Trace:
     @property
     def n_tool_calls(self) -> int:
         return sum(1 for s in self.steps if s.tool_name is not None)
+
+
+_DECORATION = "*_`#>\"'“”「」[]() \t"
+
+_COMPLETE = re.compile(
+    r"^(?:(?:[^:：\n]{0,12}[,，]\s*)?(?:final|response)|최종|완료)\s*(?:답|answer)?\s*[:：]"
+)
+
+
+def _declaration_lines(text: Any) -> list[str]:
+    lines = [
+        line.strip().strip(_DECORATION).lower()
+        for line in str(text or "").splitlines()
+        if line.strip()
+    ]
+    return lines[:1] + (lines[-1:] if len(lines) > 1 else [])
+
+
+def response_is_complete(response: dict[str, Any]) -> bool:
+    if response.get("completed") is True or response.get("done") is True:
+        return True
+    if response.get("final") is not None:
+        return True
+    return any(
+        line.startswith("task completed") or _COMPLETE.match(line)
+        for line in _declaration_lines(response.get("text", ""))
+    )

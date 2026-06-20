@@ -5,12 +5,21 @@ from dataclasses import dataclass
 from typing import Any
 
 from agent_loops.loops import (
+    react,
     single_call,
 )
 
-LOOPS = {m.NAME: m for m in (single_call,)}
+LOOPS = {
+    m.NAME: m
+    for m in (
+        single_call,
+        react,
+    )
+}
 
-LOOP_KWARGS = {}
+LOOP_KWARGS = {
+    "react": {"max_steps": 10},
+}
 
 
 def kwargs_for(name: str) -> dict:
