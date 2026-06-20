@@ -7,13 +7,14 @@
 
 스택 = 코어 루프 [+ 조합] [+ 하네스 층]. 예: `react`
 
-### 코어 루프 (1)
+### 코어 루프 (2)
 
 각 루프는 독립된 파일로 구현하며, 논문 또는 저자 코드에서 정의한 핵심 동작을 테스트로 고정한다.
 
 | 루프 | 구조 | 출처 | 참고 코드 |
 |---|---|---|---|
 | `single_call` | LLM 1회 → 반환된 tool call 실행 → 종료. 루프 없음 (하한선) | function calling | — |
+| `react` | Thought → Action → Observation 반복, 관측에 따라 다음 행동 결정 | [2210.03629](https://arxiv.org/abs/2210.03629) | [ysymyth/ReAct](https://github.com/ysymyth/ReAct) |
 
 ## 실행
 
@@ -42,6 +43,7 @@ python scripts/run_cells.py --cells single_turn_single_step --loops react --limi
 | 루프 | 1T1S | 1TMS | MTMS |
 |---|---|---|---|
 | `single_call` | 50.0 / 1.0 / 12 | 0.0 / 1.0 / 12 | 0.0 / 3.4 / 35 |
+| `react` | 83.3 / 2.7 / 9 | 57.1 / 6.3 / 34 | 23.1 / 19.9 / 99 |
 
 ## 환경
 

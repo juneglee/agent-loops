@@ -11,6 +11,12 @@ SYSTEM = (
 
 LOOP_INSTRUCTIONS: dict[str, str] = {
     "single_call": ("Call the tool that carries out the request **once**."),
+    "react": (
+        "Work one step at a time. Call one tool, look at its result, then decide the "
+        "next step. You may write a short thought before calling a tool "
+        "(a thought alone keeps the loop going).\n"
+        "When the request is complete, do not call a tool; answer with a line that starts with `Final:`."
+    ),
 }
 
 INSTRUCTION_VARIANTS: dict[str, dict[str, str]] = {
