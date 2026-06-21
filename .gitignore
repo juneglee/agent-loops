@@ -225,4 +225,5 @@ models/
 data/tasks/generic_v1/
 data/tasks/private/
 results/traces/
+results/tasks/
 .DS_Store
