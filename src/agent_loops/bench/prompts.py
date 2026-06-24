@@ -17,6 +17,11 @@ LOOP_INSTRUCTIONS: dict[str, str] = {
         "(a thought alone keeps the loop going).\n"
         "When the request is complete, do not call a tool; answer with a line that starts with `Final:`."
     ),
+    "plan_and_solve": (
+        "First write the whole plan as a numbered list, then it is executed as written.\n"
+        "Line format: `1. tool_name[arg=value]`\n"
+        "Do not refer to earlier results; every step is independent."
+    ),
 }
 
 INSTRUCTION_VARIANTS: dict[str, dict[str, str]] = {

@@ -29,6 +29,11 @@ class Trace:
     parse_ok: bool = True
     terminated_by: str = "success"
 
+    def stop(self, reason: str) -> Trace:
+        self.terminated_by = reason
+        self.parse_ok = reason not in ("parse_fail", "no_action")
+        return self
+
     @property
     def n_llm_calls(self) -> int:
         return sum(1 for s in self.steps if s.llm_response is not None)
@@ -63,3 +68,11 @@ def response_is_complete(response: dict[str, Any]) -> bool:
         line.startswith("task completed") or _COMPLETE.match(line)
         for line in _declaration_lines(response.get("text", ""))
     )
+
+
+def classify_stop(text: str | None, did_work: bool) -> str:
+    if (text or "").strip():
+        if response_is_complete({"text": text}):
+            return "success" if did_work else "no_action"
+        return "no_plan" if did_work else "parse_fail"
+    return "success" if did_work else "no_action"
