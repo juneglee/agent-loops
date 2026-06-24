@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from agent_loops.loops import (
+    plan_and_solve,
     react,
     single_call,
 )
@@ -14,6 +15,7 @@ LOOPS = {
     for m in (
         single_call,
         react,
+        plan_and_solve,
     )
 }
 
