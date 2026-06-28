@@ -7,6 +7,7 @@ from typing import Any
 from agent_loops.loops import (
     plan_and_solve,
     react,
+    rewoo,
     single_call,
 )
 
@@ -15,6 +16,7 @@ LOOPS = {
     for m in (
         single_call,
         react,
+        rewoo,
         plan_and_solve,
     )
 }
