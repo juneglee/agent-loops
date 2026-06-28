@@ -17,6 +17,17 @@ LOOP_INSTRUCTIONS: dict[str, str] = {
         "(a thought alone keeps the loop going).\n"
         "When the request is complete, do not call a tool; answer with a line that starts with `Final:`."
     ),
+    "rewoo": (
+        "First write the **whole plan**. Do not execute any tool yet.\n"
+        "Write each step as two lines: a `Plan:` line saying what this step does, then the tool call:\n"
+        "  Plan: what this step does\n"
+        "  #E1 = tool_name[arg=value, arg2=value2]\n"
+        "Refer to an earlier result as `#E1`. Example:\n"
+        "  Plan: first do A\n"
+        "  #E1 = toolA[arg=value]\n"
+        "  Plan: use the result of A to do B\n"
+        "  #E2 = toolB[arg=#E1]"
+    ),
     "plan_and_solve": (
         "First write the whole plan as a numbered list, then it is executed as written.\n"
         "Line format: `1. tool_name[arg=value]`\n"
