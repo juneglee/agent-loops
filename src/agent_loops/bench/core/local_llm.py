@@ -12,20 +12,16 @@ class LocalLLM:
         self,
         tools: list[dict[str, Any]],
         *,
-        runtime: str = "llamacpp",
         base_url: str | None = None,
         model: str = "local",
-        grammar: str | None = None,
         timeout: float = 120.0,
         temperature: float = 0.0,
         seed: int | None = 0,
         extra_system: str | None = None,
     ) -> None:
         self.tools = tools
-        self.runtime = runtime
         self.base_url = base_url
         self.model = model
-        self.grammar = grammar
         self.timeout = timeout
         self.temperature = temperature
         self.seed = seed
@@ -45,12 +41,10 @@ class LocalLLM:
         if self.extra_system:
             prepared = _append_system(prepared, self.extra_system)
         out = call(
-            runtime=self.runtime,
             base_url=self.base_url,
             model=self.model,
             messages=_serialize(prepared),
             tools=None if text_mode else self.tools,
-            grammar=self.grammar,
             timeout=self.timeout,
             temperature=self.temperature,
             **({"seed": self.seed} if self.seed is not None else {}),

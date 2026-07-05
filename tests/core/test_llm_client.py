@@ -1,6 +1,4 @@
-import pytest
-
-from agent_loops.bench.core.llm import RUNTIMES, build_payload, call, parse_response
+from agent_loops.bench.core.llm import build_payload, call, parse_response
 
 
 def test_parses_tool_call_from_openai_response():
@@ -67,31 +65,9 @@ def test_detects_quiet_failure_when_text_mentions_tool_but_no_call():
 
 
 def test_payload_forces_temperature_zero_by_default():
-    payload = build_payload(runtime="llamacpp", model="m", messages=[], tools=[])
+    payload = build_payload(model="m", messages=[], tools=[])
 
     assert payload["temperature"] == 0
-
-
-def test_llamacpp_payload_carries_grammar():
-    payload = build_payload(
-        runtime="llamacpp", model="m", messages=[], tools=[], grammar='root ::= "x"'
-    )
-
-    assert payload["grammar"] == 'root ::= "x"'
-
-
-def test_ollama_rejects_grammar_instead_of_dropping_it_silently():
-    with pytest.raises(ValueError, match="grammar"):
-        build_payload(
-            runtime="ollama", model="m", messages=[], tools=[], grammar='root ::= "x"'
-        )
-
-
-def test_runtime_registry_declares_grammar_support():
-    assert RUNTIMES["llamacpp"].supports_grammar is True
-    assert RUNTIMES["ollama"].supports_grammar is False
-    assert RUNTIMES["llamacpp"].default_base_url.endswith("/v1")
-    assert RUNTIMES["ollama"].default_base_url.endswith("/v1")
 
 
 def test_non_dict_arguments_are_a_parse_failure():
@@ -133,9 +109,7 @@ def test_missing_tool_name_is_a_parse_failure():
 def test_build_payload_carries_seed_through_extra():
     from agent_loops.bench.core.llm import build_payload
 
-    payload = build_payload(
-        runtime="llamacpp", model="m", messages=[], tools=None, seed=42
-    )
+    payload = build_payload(model="m", messages=[], tools=None, seed=42)
     assert payload["seed"] == 42
 
 
@@ -149,3 +123,26 @@ def test_transport_error_returns_the_same_keys_as_a_parsed_response(monkeypatch)
     out = call(messages=[{"role": "user", "content": "hi"}])
     assert out["parse_ok"] is False and out["error"].startswith("ConnectionError")
     assert set(out) >= set(parse_response({}))
+
+
+def test_local_llm_forwards_temperature_and_seed_to_the_runtime(monkeypatch):
+    import agent_loops.bench.core.local_llm as mod
+
+    sent = {}
+
+    def spy(**kwargs):
+        sent.update(kwargs)
+        return {
+            "tool_calls": None,
+            "text": "",
+            "parse_ok": True,
+            "quiet_failure": False,
+            "truncated": False,
+            "raw": {},
+        }
+
+    monkeypatch.setattr(mod, "call", spy)
+    llm = mod.LocalLLM([], seed=7)
+    llm(messages=[{"role": "user", "content": "x"}])
+    assert sent.get("seed") == 7
+    assert sent.get("temperature") == 0.0
