@@ -7,7 +7,7 @@
 
 스택 = 코어 루프 [+ 조합] [+ 하네스 층]. 예: `react`
 
-### 코어 루프 (4)
+### 코어 루프 (5)
 
 각 루프는 독립된 파일로 구현하며, 논문 또는 저자 코드에서 정의한 핵심 동작을 테스트로 고정한다.
 
@@ -17,6 +17,7 @@
 | `react` | Thought → Action → Observation 반복, 관측에 따라 다음 행동 결정 | [2210.03629](https://arxiv.org/abs/2210.03629) | [ysymyth/ReAct](https://github.com/ysymyth/ReAct) |
 | `plan_and_solve` | 전체 계획 생성 → 계획대로 단계 실행, 관측 기반 재계획 없음. 원 논문은 prompting 기법, 여기서는 도구 루프로 변형 | [2305.04091](https://arxiv.org/abs/2305.04091) | [AGI-Edgerunners/Plan-and-Solve-Prompting](https://github.com/AGI-Edgerunners/Plan-and-Solve-Prompting) |
 | `rewoo` | 관측 피드백 없이 Plan 과 `#E` 의존성 생성 → Worker 실행 → Solver 가 evidence 종합 | [2305.18323](https://arxiv.org/abs/2305.18323) | [billxbf/ReWOO](https://github.com/billxbf/ReWOO) |
+| `fixed_pipeline` | localization → repair → validation 고정 파이프라인(여기서는 locate → act → verify), 루프 없음 | [2407.01489](https://arxiv.org/abs/2407.01489) | [OpenAutoCoder/Agentless](https://github.com/OpenAutoCoder/Agentless) |
 
 ## 실행
 
@@ -49,6 +50,7 @@ python scripts/run_tasks.py --tasks tests/fixtures/samples/tasks.json --loops re
 | `react` | 83.3 / 2.7 / 9 | 57.1 / 6.3 / 34 | 23.1 / 19.9 / 99 |
 | `plan_and_solve` | 66.7 / 1.0 / 9 | 14.3 / 1.0 / 9 | 0.0 / 3.4 / 26 |
 | `rewoo` | 66.7 / 2.0 / 19 | 28.6 / 2.0 / 15 | 0.0 / 6.8 / 66 |
+| `fixed_pipeline` | 83.3 / 3.0 / 28 | 28.6 / 3.0 / 21 | 7.7 / 10.2 / 98 |
 
 ## 환경
 

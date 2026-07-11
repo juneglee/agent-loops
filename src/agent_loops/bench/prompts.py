@@ -33,6 +33,13 @@ LOOP_INSTRUCTIONS: dict[str, str] = {
         "Line format: `1. tool_name[arg=value]`\n"
         "Do not refer to earlier results; every step is independent."
     ),
+    "fixed_pipeline": (
+        "Carry out the fixed stages one by one. Do not repeat or go back.\n"
+        "  locate — find the target\n"
+        "  act    — carry out the request\n"
+        "  verify — check the result\n"
+        "Call the tool for the current stage once."
+    ),
 }
 
 INSTRUCTION_VARIANTS: dict[str, dict[str, str]] = {
