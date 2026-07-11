@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from agent_loops.loops import (
+    fixed_pipeline,
     plan_and_solve,
     react,
     rewoo,
@@ -18,6 +19,7 @@ LOOPS = {
         react,
         rewoo,
         plan_and_solve,
+        fixed_pipeline,
     )
 }
 
