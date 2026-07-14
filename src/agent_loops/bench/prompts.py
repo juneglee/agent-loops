@@ -33,6 +33,12 @@ LOOP_INSTRUCTIONS: dict[str, str] = {
         "Line format: `1. tool_name[arg=value]`\n"
         "Do not refer to earlier results; every step is independent."
     ),
+    "plan_and_execute": (
+        "Write the plan as a numbered list. Format: `1. tool_name[arg=value]`\n"
+        "After **every step of the plan has been executed** you will see the results and plan again. "
+        "Do not repeat steps that were already done.\n"
+        "If nothing is left to do, return an empty plan."
+    ),
     "fixed_pipeline": (
         "Carry out the fixed stages one by one. Do not repeat or go back.\n"
         "  locate — find the target\n"
