@@ -7,7 +7,7 @@
 
 스택 = 코어 루프 [+ 조합] [+ 하네스 층]. 예: `react`
 
-### 코어 루프 (5)
+### 코어 루프 (6)
 
 각 루프는 독립된 파일로 구현하며, 논문 또는 저자 코드에서 정의한 핵심 동작을 테스트로 고정한다.
 
@@ -18,6 +18,7 @@
 | `plan_and_solve` | 전체 계획 생성 → 계획대로 단계 실행, 관측 기반 재계획 없음. 원 논문은 prompting 기법, 여기서는 도구 루프로 변형 | [2305.04091](https://arxiv.org/abs/2305.04091) | [AGI-Edgerunners/Plan-and-Solve-Prompting](https://github.com/AGI-Edgerunners/Plan-and-Solve-Prompting) |
 | `rewoo` | 관측 피드백 없이 Plan 과 `#E` 의존성 생성 → Worker 실행 → Solver 가 evidence 종합 | [2305.18323](https://arxiv.org/abs/2305.18323) | [billxbf/ReWOO](https://github.com/billxbf/ReWOO) |
 | `fixed_pipeline` | localization → repair → validation 고정 파이프라인(여기서는 locate → act → verify), 루프 없음 | [2407.01489](https://arxiv.org/abs/2407.01489) | [OpenAutoCoder/Agentless](https://github.com/OpenAutoCoder/Agentless) |
+| `plan_and_execute` | 튜토리얼은 계획 → 한 step 실행 → 재계획. 여기서는 계획 전체 실행 후 재계획하는 변형 | LangGraph | [plan-and-execute tutorial](https://github.com/langchain-ai/langgraph/blob/23961cff61a42b52525f3b20b4094d8d2fba1744/docs/docs/tutorials/plan-and-execute/plan-and-execute.ipynb) |
 
 ## 실행
 
@@ -51,6 +52,7 @@ python scripts/run_tasks.py --tasks tests/fixtures/samples/tasks.json --loops re
 | `plan_and_solve` | 66.7 / 1.0 / 9 | 14.3 / 1.0 / 9 | 0.0 / 3.4 / 26 |
 | `rewoo` | 66.7 / 2.0 / 19 | 28.6 / 2.0 / 15 | 0.0 / 6.8 / 66 |
 | `fixed_pipeline` | 83.3 / 3.0 / 28 | 28.6 / 3.0 / 21 | 7.7 / 10.2 / 98 |
+| `plan_and_execute` | 16.7 / 1.5 / 6 | 14.3 / 2.0 / 10 | 7.7 / 7.1 / 45 |
 
 ## 환경
 
