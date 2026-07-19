@@ -39,6 +39,18 @@ LOOP_INSTRUCTIONS: dict[str, str] = {
         "Do not repeat steps that were already done.\n"
         "If nothing is left to do, return an empty plan."
     ),
+    "plan_and_act": (
+        "Write a **high-level plan** to complete the request as a numbered list. Each line is one "
+        "natural-language sentence; do not write tool names or arguments. Format: `1. step description`\n"
+        "An executor carries out the plan one action at a time; after each action you will see the "
+        "actions taken so far and must write an **updated plan**.\n"
+        "Always output a plan, never a final answer; the executor decides when the request is done."
+    ),
+    "plan_and_act_executor": (
+        "You are given the current plan and the actions taken so far. Decide which step of the plan "
+        "you are on and call **one** tool that carries it out.\n"
+        "When the whole request is complete, do not call a tool; answer with a line that starts with `Final:`."
+    ),
     "fixed_pipeline": (
         "Carry out the fixed stages one by one. Do not repeat or go back.\n"
         "  locate — find the target\n"

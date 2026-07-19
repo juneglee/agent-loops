@@ -6,6 +6,7 @@ from typing import Any
 
 from agent_loops.loops import (
     fixed_pipeline,
+    plan_and_act,
     plan_and_execute,
     plan_and_solve,
     react,
@@ -21,6 +22,7 @@ LOOPS = {
         rewoo,
         plan_and_solve,
         plan_and_execute,
+        plan_and_act,
         fixed_pipeline,
     )
 }
@@ -28,6 +30,7 @@ LOOPS = {
 LOOP_KWARGS = {
     "react": {"max_steps": 10},
     "plan_and_execute": {"max_rounds": 5},
+    "plan_and_act": {"max_steps": 10},
 }
 
 
