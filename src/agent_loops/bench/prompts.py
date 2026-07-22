@@ -58,6 +58,15 @@ LOOP_INSTRUCTIONS: dict[str, str] = {
         "  verify — check the result\n"
         "Call the tool for the current stage once."
     ),
+    "llm_compiler": (
+        "First write the **whole plan**. Do not execute any tool yet.\n"
+        "Line format: `#E1 = tool_name[arg=value]`\n"
+        "Refer to an earlier result as `#E1` only when the step needs it; steps without references "
+        "are independent and may run in parallel.\n"
+        "After execution results (executed) and a Thought giving the reason to replan are given, "
+        "do not repeat actions that were already executed; plan only the remaining actions in the "
+        "same format. Whether to finish is decided separately by the joiner."
+    ),
 }
 
 INSTRUCTION_VARIANTS: dict[str, dict[str, str]] = {
