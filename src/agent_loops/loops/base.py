@@ -48,6 +48,9 @@ _DECORATION = "*_`#>\"'“”「」[]() \t"
 _COMPLETE = re.compile(
     r"^(?:(?:[^:：\n]{0,12}[,，]\s*)?(?:final|response)|최종|완료)\s*(?:답|answer)?\s*[:：]"
 )
+_GIVE_UP = re.compile(
+    r"^(?:i\s+)?(?:give up|giving up|task failed|포기)\s*(?:[:：—–\-]|[.!]?\s*$)"
+)
 
 
 def _declaration_lines(text: Any) -> list[str]:
@@ -67,6 +70,12 @@ def response_is_complete(response: dict[str, Any]) -> bool:
     return any(
         line.startswith("task completed") or _COMPLETE.match(line)
         for line in _declaration_lines(response.get("text", ""))
+    )
+
+
+def response_gives_up(response: dict[str, Any]) -> bool:
+    return any(
+        _GIVE_UP.match(line) for line in _declaration_lines(response.get("text", ""))
     )
 
 

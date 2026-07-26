@@ -7,7 +7,7 @@
 
 스택 = 코어 루프 [+ 오케스트레이션 조합] [+ 하네스 기능]. 예: `react`
 
-### 코어 루프 (8)
+### 코어 루프 (9)
 
 각 루프는 독립된 파일로 구현하며, 논문 또는 저자 코드에서 정의한 핵심 동작을 테스트로 고정한다.
 
@@ -21,6 +21,7 @@
 | `plan_and_execute` | 튜토리얼은 계획 → 한 step 실행 → 재계획. 여기서는 계획 전체 실행 후 재계획하는 변형 | LangGraph | [plan-and-execute tutorial](https://github.com/langchain-ai/langgraph/blob/23961cff61a42b52525f3b20b4094d8d2fba1744/docs/docs/tutorials/plan-and-execute/plan-and-execute.ipynb) |
 | `plan_and_act` | Planner 가 high-level plan 생성 → 별도 Executor 가 action 수행 → 관측 기반 재계획(동적 재계획 판) | [2503.09572](https://arxiv.org/abs/2503.09572) | [SqueezeAILab/plan-and-act](https://github.com/SqueezeAILab/plan-and-act) |
 | `llm_compiler` | 함수 호출 DAG 생성 → 의존성이 풀린 task 실행(여기서는 순차) → joiner 가 종료/재계획 판정 | [2312.04511](https://arxiv.org/abs/2312.04511) | [SqueezeAILab/LLMCompiler](https://github.com/SqueezeAILab/LLMCompiler) |
+| `adapt` | Executor 우선 실행 → 실패한 subtask 만 재귀 분해 (And/Or) | [2311.05772](https://arxiv.org/abs/2311.05772) | [archiki/ADaPT](https://github.com/archiki/ADaPT) |
 
 ## 실행
 
@@ -57,6 +58,7 @@ python scripts/run_tasks.py --tasks tests/fixtures/samples/tasks.json --loops re
 | `plan_and_execute` | 66.7 / 3.2 / 12 | 42.9 / 4.3 / 24 | 0.0 / 12.8 / 88 |
 | `plan_and_act` | 83.3 / 6.3 / 33 | 71.4 / 12.7 / 131 | 30.8 / 29.5 / 260 |
 | `llm_compiler` | 66.7 / 2.3 / 12 | 14.3 / 2.0 / 13 | 7.7 / 9.7 / 72 |
+| `adapt` | 83.3 / 6.7 / 25 | 85.7 / 5.1 / 25 | 46.2 / 27.5 / 120 |
 
 ## 환경
 
