@@ -51,6 +51,13 @@ LOOP_INSTRUCTIONS: dict[str, str] = {
         "you are on and call **one** tool that carries it out.\n"
         "When the whole request is complete, do not call a tool; answer with a line that starts with `Final:`."
     ),
+    "adapt": (
+        "Work one step at a time. Call one tool, look at its result, then decide the next step. "
+        "You may write a short thought before calling a tool.\n"
+        "When the request is complete, do not call a tool; answer `Task completed`.\n"
+        "If you judge that the request cannot be completed as given, do not call a tool; answer with "
+        "a line that starts with `Task failed:` and give the reason (it will then be split into smaller subtasks)."
+    ),
     "fixed_pipeline": (
         "Carry out the fixed stages one by one. Do not repeat or go back.\n"
         "  locate — find the target\n"

@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from agent_loops.loops import (
+    adapt,
     fixed_pipeline,
     llm_compiler,
     plan_and_act,
@@ -24,6 +25,7 @@ LOOPS = {
         plan_and_solve,
         plan_and_execute,
         plan_and_act,
+        adapt,
         fixed_pipeline,
         llm_compiler,
     )
@@ -33,6 +35,7 @@ LOOP_KWARGS = {
     "react": {"max_steps": 10},
     "plan_and_execute": {"max_rounds": 5},
     "plan_and_act": {"max_steps": 10},
+    "adapt": {"max_depth": 3, "max_calls": 30},
     "llm_compiler": {"max_replans": 1},
 }
 

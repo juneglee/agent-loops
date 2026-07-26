@@ -1,4 +1,4 @@
-from agent_loops.loops.base import response_is_complete
+from agent_loops.loops.base import response_gives_up, response_is_complete
 
 
 def test_completion_marker_in_text_counts_as_complete():
@@ -23,4 +23,17 @@ def test_marker_is_read_only_from_first_or_last_line():
     assert response_is_complete({"text": "All done.\nFinal: moved two files"})
     assert not response_is_complete(
         {"text": "Progress so far:\nFinal: step one\nnext I will move the file"}
+    )
+
+
+def test_give_up_marker_is_recognised_and_is_not_completion():
+    assert response_gives_up(
+        {"tool_calls": None, "text": "Task failed: file not found"}
+    )
+    assert response_gives_up({"tool_calls": None, "text": "Give up: need another path"})
+    assert not response_gives_up(
+        {"tool_calls": None, "text": "Let me list the directory first"}
+    )
+    assert not response_is_complete(
+        {"tool_calls": None, "text": "Task failed: file not found"}
     )
