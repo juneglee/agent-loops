@@ -58,6 +58,15 @@ LOOP_INSTRUCTIONS: dict[str, str] = {
         "If you judge that the request cannot be completed as given, do not call a tool; answer with "
         "a line that starts with `Task failed:` and give the reason (it will then be split into smaller subtasks)."
     ),
+    "codeact": (
+        "Act by writing **Python code**. Pass the code to the `execute_code` tool; it runs and its "
+        "stdout comes back. You may combine several functions in one piece of code.\n"
+        "This is a **virtual environment**, not a real OS. There is no `import`; os, subprocess, "
+        "open and the like are unavailable. Only the functions listed below can be called "
+        "(e.g. `print(ls(a=True))`).\n"
+        "If execution fails, read the traceback, fix the code and submit it again.\n"
+        "When the request is complete, do not call the tool; answer with a line that starts with `Final:`."
+    ),
     "fixed_pipeline": (
         "Carry out the fixed stages one by one. Do not repeat or go back.\n"
         "  locate — find the target\n"
