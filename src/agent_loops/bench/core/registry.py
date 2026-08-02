@@ -13,6 +13,7 @@ from agent_loops.loops import (
     plan_and_execute,
     plan_and_solve,
     react,
+    reflexion,
     rewoo,
     single_call,
 )
@@ -29,6 +30,7 @@ LOOPS = {
         adapt,
         codeact,
         fixed_pipeline,
+        reflexion,
         llm_compiler,
     )
 }
@@ -39,6 +41,7 @@ LOOP_KWARGS = {
     "plan_and_act": {"max_steps": 10},
     "adapt": {"max_depth": 3, "max_calls": 30},
     "codeact": {"max_steps": 6},
+    "reflexion": {"max_trials": 3, "max_steps": 10},
     "llm_compiler": {"max_replans": 1},
 }
 
