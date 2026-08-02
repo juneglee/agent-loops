@@ -7,7 +7,7 @@
 
 스택 = 코어 루프 [+ 오케스트레이션 조합] [+ 하네스 기능]. 예: `react`
 
-### 코어 루프 (10)
+### 코어 루프 (11)
 
 각 루프는 독립된 파일로 구현하며, 논문 또는 저자 코드에서 정의한 핵심 동작을 테스트로 고정한다.
 
@@ -23,6 +23,7 @@
 | `llm_compiler` | 함수 호출 DAG 생성 → 의존성이 풀린 task 실행(여기서는 순차) → joiner 가 종료/재계획 판정 | [2312.04511](https://arxiv.org/abs/2312.04511) | [SqueezeAILab/LLMCompiler](https://github.com/SqueezeAILab/LLMCompiler) |
 | `adapt` | Executor 우선 실행 → 실패한 subtask 만 재귀 분해 (And/Or) | [2311.05772](https://arxiv.org/abs/2311.05772) | [archiki/ADaPT](https://github.com/archiki/ADaPT) |
 | `codeact` | Python 코드 action → 실행 결과와 오류 관측 → 코드 수정 반복 | [2402.01030](https://arxiv.org/abs/2402.01030) | [xingyaoww/code-act](https://github.com/xingyaoww/code-act) |
+| `reflexion` | trial → feedback → 언어적 reflection → memory → 다음 trial | [2303.11366](https://arxiv.org/abs/2303.11366) | [noahshinn/reflexion](https://github.com/noahshinn/reflexion) |
 
 ## 실행
 
@@ -61,6 +62,7 @@ python scripts/run_tasks.py --tasks tests/fixtures/samples/tasks.json --loops re
 | `llm_compiler` | 66.7 / 2.3 / 12 | 14.3 / 2.0 / 13 | 7.7 / 9.7 / 72 |
 | `adapt` | 83.3 / 6.7 / 25 | 85.7 / 5.1 / 25 | 46.2 / 27.5 / 120 |
 | `codeact` | 33.3 / 2.7 / 25 | 28.6 / 2.1 / 13 | 0.0 / 11.3 / 101 |
+| `reflexion` | 66.7 / 4.3 / 16 | 71.4 / 8.6 / 62 | 30.8 / 23.0 / 169 |
 
 ## 환경
 

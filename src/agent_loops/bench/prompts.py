@@ -74,6 +74,16 @@ LOOP_INSTRUCTIONS: dict[str, str] = {
         "  verify — check the result\n"
         "Call the tool for the current stage once."
     ),
+    "reflexion": (
+        "Work one step at a time. Call one tool, look at its result, then decide the "
+        "next step. You may write a short thought before calling a tool "
+        "(a thought alone keeps the loop going).\n"
+        "When the request is complete, do not call a tool; answer with a line that starts with `Final:`. "
+        "If this attempt cannot complete the request, do not call a tool; answer with a line that "
+        "starts with `Task failed:` and give the reason.\n"
+        "If reflections from earlier attempts are given, follow their plan and do not repeat the same mistakes. "
+        "Repeating the same tool call twice in a row ends the attempt as a failure."
+    ),
     "llm_compiler": (
         "First write the **whole plan**. Do not execute any tool yet.\n"
         "Line format: `#E1 = tool_name[arg=value]`\n"
