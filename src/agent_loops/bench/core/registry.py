@@ -7,6 +7,7 @@ from typing import Any
 from agent_loops.loops import (
     adapt,
     codeact,
+    dfsdt,
     fixed_pipeline,
     llm_compiler,
     plan_and_act,
@@ -31,6 +32,7 @@ LOOPS = {
         codeact,
         fixed_pipeline,
         reflexion,
+        dfsdt,
         llm_compiler,
     )
 }
@@ -42,6 +44,7 @@ LOOP_KWARGS = {
     "adapt": {"max_depth": 3, "max_calls": 30},
     "codeact": {"max_steps": 6},
     "reflexion": {"max_trials": 3, "max_steps": 10},
+    "dfsdt": {"breadth": 2, "max_depth": 6, "max_calls": 30},
     "llm_compiler": {"max_replans": 1},
 }
 
