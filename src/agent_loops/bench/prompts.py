@@ -84,6 +84,14 @@ LOOP_INSTRUCTIONS: dict[str, str] = {
         "If reflections from earlier attempts are given, follow their plan and do not repeat the same mistakes. "
         "Repeating the same tool call twice in a row ends the attempt as a failure."
     ),
+    "dfsdt": (
+        "Work one step at a time. Call one tool, look at its result, then decide the "
+        "next step. You may write a short thought before calling a tool "
+        "(a thought alone keeps the loop going).\n"
+        "If the current path cannot succeed, do not call a tool; answer with a line that starts with "
+        "`Give up:` and give the reason (another path will then be explored).\n"
+        "When the request is complete, do not call a tool; answer with a line that starts with `Final:`."
+    ),
     "llm_compiler": (
         "First write the **whole plan**. Do not execute any tool yet.\n"
         "Line format: `#E1 = tool_name[arg=value]`\n"
