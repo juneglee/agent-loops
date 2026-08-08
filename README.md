@@ -35,6 +35,7 @@ pip install -e ".[dev,bench]"
 python examples/run_loop.py --loop react --task "list the files in docs"
 python scripts/run_cells.py --cells single_turn_single_step --loops react --limit 2
 python scripts/run_tasks.py --tasks tests/fixtures/samples/tasks.json --loops react
+python examples/demo.py
 ```
 
 ## 결과

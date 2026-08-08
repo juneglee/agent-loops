@@ -23,3 +23,12 @@ def test_loop_instructions_are_domain_neutral():
 
 def test_system_prompt_still_tells_the_model_to_act():
     assert "tool" in prompts.SYSTEM
+
+
+def test_builtin_tool_schemas_are_not_used_for_benchmark():
+    assert hasattr(prompts, "DEMO_TOOLS"), (
+        "the name must reveal that these are demo-only"
+    )
+    assert not hasattr(prompts, "tool_schemas"), (
+        "a name that can be confused with the benchmark must go"
+    )
