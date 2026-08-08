@@ -107,3 +107,13 @@ def test_codeact_instruction_declares_no_imports_and_virtual_filesystem():
     text = LOOP_INSTRUCTIONS["codeact"] + code_signatures([])
     assert "import" in text
     assert "virtual" in text
+
+
+def test_demo_tool_schemas_are_openai_shaped():
+    schemas = prompts.demo_tool_schemas()
+
+    assert schemas, "with empty tool schemas no loop can use a tool"
+    for s in schemas:
+        assert s["type"] == "function"
+        assert "name" in s["function"]
+        assert "parameters" in s["function"]
