@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from types import SimpleNamespace
 from typing import Any
 
+from agent_loops.compose import hierarchical
 from agent_loops.loops import (
     adapt,
     codeact,
@@ -36,6 +38,15 @@ LOOPS = {
         llm_compiler,
     )
 }
+_COMPOSED = [
+    SimpleNamespace(NAME=r.NAME, run=r)
+    for r in (
+        hierarchical(react, worker_kwargs={"max_steps": 6}),
+        hierarchical(single_call),
+        hierarchical(codeact, worker_kwargs={"max_steps": 4}),
+    )
+]
+LOOPS.update({m.NAME: m for m in _COMPOSED})
 
 LOOP_KWARGS = {
     "react": {"max_steps": 10},

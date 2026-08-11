@@ -92,6 +92,12 @@ LOOP_INSTRUCTIONS: dict[str, str] = {
         "`Give up:` and give the reason (another path will then be explored).\n"
         "When the request is complete, do not call a tool; answer with a line that starts with `Final:`."
     ),
+    "hierarchical": (
+        "Split this request into a **list of subtasks** and answer only in the form `- subtask`. "
+        "Write each subtask concretely enough that a worker can carry it out from that line alone.\n"
+        "If results of subtasks done so far are given, list **only the remaining work**; "
+        "if nothing remains, answer with a line that starts with `Final:`."
+    ),
     "llm_compiler": (
         "First write the **whole plan**. Do not execute any tool yet.\n"
         "Line format: `#E1 = tool_name[arg=value]`\n"

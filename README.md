@@ -5,7 +5,7 @@
 
 ## 구성
 
-스택 = 코어 루프 [+ 조합] [+ 하네스 층]. 예: `react`
+스택 = 코어 루프 [+ 조합] [+ 하네스 층]. 예: `react`, `planner+react`
 
 ### 코어 루프 (12)
 
@@ -26,6 +26,16 @@
 | `reflexion` | trial → feedback → 언어적 reflection → memory → 다음 trial | [2303.11366](https://arxiv.org/abs/2303.11366) | [noahshinn/reflexion](https://github.com/noahshinn/reflexion) |
 | `dfsdt` | branch 탐색 → 포기 시 sibling 분기 → 막히면 backtracking 하는 DFS | [2307.16789](https://arxiv.org/abs/2307.16789) | [OpenBMB/ToolBench](https://github.com/OpenBMB/ToolBench) |
 
+### 조합 — 계획기 × worker (3)
+
+루프를 worker 로 두고 그 위에 계획기를 얹는다. worker 코드는 바꾸지 않는다.
+
+| 조합 | 구조 | 파일 |
+|---|---|---|
+| `planner+<worker>` | 계획기가 과제를 하위 과제로 나누고, 각 하위 과제를 worker 루프에 맡긴 뒤 결과를 보고 재계획 | `compose/hierarchical.py` |
+
+worker: `react`, `single_call`, `codeact`
+
 ## 실행
 
 루프 하나를 llama-server 에 붙여 돌리거나, BFCL 칸 전체를 잰다.
@@ -34,6 +44,7 @@
 pip install -e ".[dev,bench]"
 python examples/run_loop.py --loop react --task "list the files in docs"
 python scripts/run_cells.py --cells single_turn_single_step --loops react --limit 2
+python scripts/run_cells.py --cells multi_turn_multi_step --loops planner+react
 python scripts/run_tasks.py --tasks tests/fixtures/samples/tasks.json --loops react
 python examples/demo.py
 ```
@@ -66,6 +77,14 @@ python examples/demo.py
 | `codeact` | 50.0 / 2.7 / 24 | 28.6 / 2.0 / 15 | 0.0 / 11.4 / 136 |
 | `reflexion` | 83.3 / 9.8 / 76 | 71.4 / 8.0 / 64 | 38.5 / 25.6 / 214 |
 | `dfsdt` | 83.3 / 4.3 / 15 | 85.7 / 5.1 / 23 | 38.5 / 14.8 / 98 |
+
+### 조합
+
+| 스택 | 1T1S | 1TMS | MTMS |
+|---|---|---|---|
+| `planner+react` | 83.3 / 9.3 / 46 | 85.7 / 8.9 / 49 | 69.2 / 26.8 / 166 |
+| `planner+single_call` | 83.3 / 3.8 / 31 | 85.7 / 5.1 / 42 | 84.6 / 17.4 / 145 |
+| `planner+codeact` | 83.3 / 7.2 / 48 | 57.1 / 6.7 / 36 | 61.5 / 25.0 / 201 |
 
 ## 환경
 
