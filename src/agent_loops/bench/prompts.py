@@ -98,6 +98,16 @@ LOOP_INSTRUCTIONS: dict[str, str] = {
         "If results of subtasks done so far are given, list **only the remaining work**; "
         "if nothing remains, answer with a line that starts with `Final:`."
     ),
+    "adaptive": (
+        "The previous attempt failed. Look at the failure observation, do not repeat the same attempt, "
+        "and split this request into smaller subtasks; answer only as a list in the form `- subtask`. "
+        "Write each subtask concretely enough that a worker can carry it out from that line alone."
+    ),
+    "routed": (
+        "Only judge this request. If it can be carried out right away with a few tool calls, answer "
+        "`simple`; if it has to be split into several subtasks, answer `complex`. "
+        "Answer with exactly that one word."
+    ),
     "llm_compiler": (
         "First write the **whole plan**. Do not execute any tool yet.\n"
         "Line format: `#E1 = tool_name[arg=value]`\n"
