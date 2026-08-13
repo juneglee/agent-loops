@@ -26,13 +26,15 @@
 | `reflexion` | trial → feedback → 언어적 reflection → memory → 다음 trial | [2303.11366](https://arxiv.org/abs/2303.11366) | [noahshinn/reflexion](https://github.com/noahshinn/reflexion) |
 | `dfsdt` | branch 탐색 → 포기 시 sibling 분기 → 막히면 backtracking 하는 DFS | [2307.16789](https://arxiv.org/abs/2307.16789) | [OpenBMB/ToolBench](https://github.com/OpenBMB/ToolBench) |
 
-### 조합 — 계획기 × worker (3)
+### 조합 — 계획기 × worker (9)
 
 루프를 worker 로 두고 그 위에 계획기를 얹는다. worker 코드는 바꾸지 않는다.
 
 | 조합 | 구조 | 파일 |
 |---|---|---|
 | `planner+<worker>` | 계획기가 과제를 하위 과제로 나누고, 각 하위 과제를 worker 루프에 맡긴 뒤 결과를 보고 재계획 | `compose/hierarchical.py` |
+| `adaptive+<worker>` | worker 를 먼저 그대로 돌리고, 실패를 선언할 때만 계획기가 개입해 분해 | `compose/adaptive.py` |
+| `routed+<worker>` | 게이트 1콜이 과제를 단순/복잡으로 판정해 단순이면 worker 직행, 복잡이면 planner 경로 | `compose/routed.py` |
 
 worker: `react`, `single_call`, `codeact`
 
@@ -85,6 +87,12 @@ python examples/demo.py
 | `planner+react` | 83.3 / 9.3 / 46 | 85.7 / 8.9 / 49 | 69.2 / 26.8 / 166 |
 | `planner+single_call` | 83.3 / 3.8 / 31 | 85.7 / 5.1 / 42 | 84.6 / 17.4 / 145 |
 | `planner+codeact` | 83.3 / 7.2 / 48 | 57.1 / 6.7 / 36 | 61.5 / 25.0 / 201 |
+| `adaptive+react` | 100.0 / 4.2 / 19 | 85.7 / 9.9 / 61 | 84.6 / 31.3 / 218 |
+| `adaptive+single_call` | 100.0 / 3.2 / 35 | 14.3 / 2.1 / 23 | 38.5 / 10.3 / 94 |
+| `adaptive+codeact` | 100.0 / 6.3 / 80 | 57.1 / 2.0 / 15 | 53.8 / 27.1 / 315 |
+| `routed+react` | 100.0 / 8.0 / 43 | 85.7 / 7.9 / 41 | 84.6 / 22.9 / 157 |
+| `routed+single_call` | 100.0 / 3.3 / 32 | 42.9 / 4.1 / 30 | 46.2 / 12.0 / 90 |
+| `routed+codeact` | 100.0 / 5.3 / 46 | 57.1 / 3.6 / 23 | 53.8 / 19.0 / 174 |
 
 ## 환경
 
