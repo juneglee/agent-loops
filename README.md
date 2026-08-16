@@ -38,6 +38,14 @@
 
 worker: `react`, `single_call`, `codeact`
 
+### 하네스 기능 (1)
+
+루프 바깥에서 실행 환경과 모델 호출을 감싸 작업 상태 관리, 실행 결과 검증 같은 기능을 추가한다. 별도의 LLM 호출 없이 어떤 루프와 조합에도 동일하게 적용된다.
+
+| 기능 | 동작 | 파일 |
+|---|---|---|
+| `+verifier` | 도구 호출 결과를 사후조건으로 검사해, 조용히 실패한 호출을 오류 관측으로 바꿔 루프에 알린다 | `harness/verifier.py` |
+
 ## 실행
 
 루프 하나를 llama-server 에 붙여 돌리거나, BFCL 칸 전체를 잰다.
@@ -47,6 +55,7 @@ pip install -e ".[dev,bench]"
 python examples/run_loop.py --loop react --task "list the files in docs"
 python scripts/run_cells.py --cells single_turn_single_step --loops react --limit 2
 python scripts/run_cells.py --cells multi_turn_multi_step --loops planner+react
+python scripts/run_cells.py --cells multi_turn_multi_step --loops react --layers todo
 python scripts/run_tasks.py --tasks tests/fixtures/samples/tasks.json --loops react
 python examples/demo.py
 ```
@@ -93,6 +102,12 @@ python examples/demo.py
 | `routed+react` | 100.0 / 6.7 / 26 | 57.1 / 13.9 / 90 | 23.1 / 34.0 / 200 |
 | `routed+single_call` | 66.7 / 4.3 / 40 | 28.6 / 6.7 / 64 | 7.7 / 17.2 / 131 |
 | `routed+codeact` | 50.0 / 5.5 / 39 | 28.6 / 5.0 / 25 | 0.0 / 21.8 / 178 |
+
+### 하네스 기능
+
+| 스택 | 1T1S | 1TMS | MTMS |
+|---|---|---|---|
+| `react+verifier` | 83.3 / 3.2 / 9 | 57.1 / 5.0 / 28 | 23.1 / 16.3 / 103 |
 
 ## 환경
 

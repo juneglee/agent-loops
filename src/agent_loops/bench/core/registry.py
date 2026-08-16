@@ -6,6 +6,8 @@ from types import SimpleNamespace
 from typing import Any
 
 from agent_loops.compose import adaptive, hierarchical, routed
+from agent_loops.harness import apply
+from agent_loops.harness.verifier import verifier
 from agent_loops.loops import (
     adapt,
     codeact,
@@ -70,13 +72,19 @@ def kwargs_for(name: str) -> dict:
     return LOOP_KWARGS.get(name) or LOOP_KWARGS.get(name.split("+")[0], {})
 
 
-LAYERS: dict[str, Any] = {}
+LAYERS: dict[str, Any] = {"verifier": verifier()}
 
 
 def with_layers(loops: dict, layer_names: list) -> tuple[dict, list]:
     if not layer_names:
         return loops, []
-    raise KeyError(layer_names[0])
+    factories = [LAYERS[n] for n in layer_names]
+    registry = {}
+    for module in loops.values():
+        r = apply(module, factories)
+        registry[r.NAME] = SimpleNamespace(NAME=r.NAME, run=r)
+    extra = [f.TOOL_SCHEMA for f in factories if hasattr(f, "TOOL_SCHEMA")]
+    return registry, extra
 
 
 @dataclass(frozen=True)
