@@ -38,6 +38,14 @@
 
 worker: `react`, `single_call`, `codeact`
 
+### 하네스 층 (1)
+
+루프 바깥에서 프롬프트와 종료를 감싸는 하네스 층. 어느 루프와 조합에도 같은 방식으로 얹힌다.
+
+| 층 | 동작 | 파일 |
+|---|---|---|
+| `+verifier` | 루프가 끝났다고 할 때 검사 표로 상태를 확인하고, 미완이면 루프에 되돌려 보낸다 | `harness/verifier.py` |
+
 ## 실행
 
 루프 하나를 llama-server 에 붙여 돌리거나, BFCL 칸 전체를 잰다.
@@ -47,6 +55,7 @@ pip install -e ".[dev,bench]"
 python examples/run_loop.py --loop react --task "list the files in docs"
 python scripts/run_cells.py --cells single_turn_single_step --loops react --limit 2
 python scripts/run_cells.py --cells multi_turn_multi_step --loops planner+react
+python scripts/run_cells.py --cells multi_turn_multi_step --loops react --layers todo
 python scripts/run_tasks.py --tasks tests/fixtures/samples/tasks.json --loops react
 python examples/demo.py
 ```
@@ -93,6 +102,14 @@ python examples/demo.py
 | `routed+react` | 100.0 / 8.0 / 43 | 85.7 / 7.9 / 41 | 84.6 / 22.9 / 157 |
 | `routed+single_call` | 100.0 / 3.3 / 32 | 42.9 / 4.1 / 30 | 46.2 / 12.0 / 90 |
 | `routed+codeact` | 100.0 / 5.3 / 46 | 57.1 / 3.6 / 23 | 53.8 / 19.0 / 174 |
+
+### 하네스 층
+
+| 스택 | 1T1S | 1TMS | MTMS |
+|---|---|---|---|
+| `react+verifier` | 100.0 / 2.7 / 9 | 57.1 / 3.7 / 18 | 76.9 / 11.8 / 81 |
+| `single_call+verifier` | 100.0 / 1.0 / 12 | 0.0 / 1.0 / 12 | 23.1 / 3.4 / 33 |
+| `codeact+verifier` | 100.0 / 2.7 / 24 | 57.1 / 2.0 / 14 | 53.8 / 11.5 / 135 |
 
 ## 환경
 
