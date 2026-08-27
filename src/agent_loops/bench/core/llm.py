@@ -2,11 +2,15 @@ from __future__ import annotations
 
 import json
 import re
+import time
 from typing import Any
 
 DEFAULT_BASE_URL = "http://127.0.0.1:8080/v1"
 
 _LOOKS_LIKE_CALL = re.compile(r'"(name|function|tool_name)"\s*:', re.IGNORECASE)
+
+TRANSPORT_ATTEMPTS = 3
+TRANSPORT_BACKOFF_SECONDS = 0.5
 
 
 def build_payload(
@@ -98,17 +102,22 @@ def call(
         tools=tools or [],
         **extra,
     )
-    try:
-        resp = requests.post(url, json=payload, timeout=timeout)
-        resp.raise_for_status()
-        return parse_response(resp.json())
-    except Exception as exc:  # noqa: BLE001
-        return {
-            "tool_calls": None,
-            "text": "",
-            "parse_ok": False,
-            "quiet_failure": False,
-            "truncated": False,
-            "raw": None,
-            "error": f"{type(exc).__name__}: {exc}",
-        }
+    last_error: Exception = RuntimeError("no attempt made")
+    for attempt in range(TRANSPORT_ATTEMPTS):
+        try:
+            resp = requests.post(url, json=payload, timeout=timeout)
+            resp.raise_for_status()
+            return parse_response(resp.json())
+        except Exception as exc:  # noqa: BLE001
+            last_error = exc
+            if attempt + 1 < TRANSPORT_ATTEMPTS:
+                time.sleep(TRANSPORT_BACKOFF_SECONDS * (attempt + 1))
+    return {
+        "tool_calls": None,
+        "text": "",
+        "parse_ok": False,
+        "quiet_failure": False,
+        "truncated": False,
+        "raw": None,
+        "error": f"{type(last_error).__name__}: {last_error}",
+    }

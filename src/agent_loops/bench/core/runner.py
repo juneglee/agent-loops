@@ -40,6 +40,7 @@ class CaseResult:
     loop_parse_flags: int = 0
     quiet_failures: int = 0
     truncations: int = 0
+    n_llm_errors: int = 0
     terminated_by: list[str] = field(default_factory=list)
     seconds: float = 0.0
     tps: float = 0.0
@@ -123,6 +124,7 @@ def account(result: CaseResult, env: Any, llm: Any, turn_traces: list[Any]) -> N
     result.parse_failures = getattr(llm, "parse_failures", 0)
     result.quiet_failures = getattr(llm, "quiet_failures", 0)
     result.truncations = getattr(llm, "truncations", 0)
+    result.n_llm_errors = getattr(llm, "errors", 0)
     result.tps = _tps_of(turn_traces)
 
 
@@ -197,6 +199,7 @@ def summarize(results: list[CaseResult]) -> dict[str, Any]:
         "truncation_rate": (
             sum(r.truncations for r in results) / llm_calls if llm_calls else 0.0
         ),
+        "n_llm_errors": sum(r.n_llm_errors for r in results),
         "loop_no_call_rate": (
             sum(r.loop_parse_flags for r in results) / llm_calls if llm_calls else 0.0
         ),

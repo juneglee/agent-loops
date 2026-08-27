@@ -146,3 +146,49 @@ def test_local_llm_forwards_temperature_and_seed_to_the_runtime(monkeypatch):
     llm(messages=[{"role": "user", "content": "x"}])
     assert sent.get("seed") == 7
     assert sent.get("temperature") == 0.0
+
+
+def test_transport_errors_are_retried_before_giving_up(monkeypatch):
+    import requests
+
+    from agent_loops.bench.core import llm as mod
+
+    attempts = []
+
+    class _Resp:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"choices": [{"message": {"content": "hello"}}]}
+
+    def flaky(*_a, **_k):
+        attempts.append(1)
+        if len(attempts) < 3:
+            raise requests.ConnectionError("down")
+        return _Resp()
+
+    monkeypatch.setattr(requests, "post", flaky)
+    monkeypatch.setattr(mod.time, "sleep", lambda _s: None)
+
+    out = mod.call(base_url="http://x/v1", model="m", messages=[], tools=[])
+
+    assert len(attempts) == 3
+    assert out["text"] == "hello" and out.get("error") is None
+
+
+def test_transport_error_after_all_attempts_is_reported(monkeypatch):
+    import requests
+
+    from agent_loops.bench.core import llm as mod
+
+    monkeypatch.setattr(
+        requests,
+        "post",
+        lambda *_a, **_k: (_ for _ in ()).throw(requests.ConnectionError("down")),
+    )
+    monkeypatch.setattr(mod.time, "sleep", lambda _s: None)
+
+    out = mod.call(base_url="http://x/v1", model="m", messages=[], tools=[])
+
+    assert out["parse_ok"] is False and "ConnectionError" in out["error"]
