@@ -84,6 +84,7 @@ def run_dataset(
     base_url: str,
     out_dir: Path = Path("results/tasks"),
     llm_factory: Any = None,
+    cache_prompt: bool | None = None,
 ) -> list[Path]:
     track = TaskTrack(Path(tasks_path))
     prompt_version = apply_variant(instruction_variant)
@@ -105,6 +106,7 @@ def run_dataset(
                 model=model,
                 temperature=temperature,
                 seed=seed + rep,
+                cache_prompt=cache_prompt,
             )
 
         return factory
@@ -217,6 +219,11 @@ def main() -> int:
     )
     ap.add_argument("--code-timeout", type=float, default=5.0)
     ap.add_argument("--bash-timeout", type=float, default=10.0)
+    ap.add_argument(
+        "--no-cache-prompt",
+        action="store_true",
+        help="ask the server not to reuse its prompt cache between requests",
+    )
     ap.add_argument("--model", default="gemma-4-E4B-it-qat-q4_0")
     ap.add_argument("--base-url", default="http://127.0.0.1:8080/v1")
     ap.add_argument("--out-dir", default="results/tasks")
@@ -236,6 +243,7 @@ def main() -> int:
         a.model,
         a.base_url,
         Path(a.out_dir),
+        cache_prompt=False if a.no_cache_prompt else None,
     )
     return 0
 

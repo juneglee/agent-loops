@@ -18,6 +18,7 @@ class LocalLLM:
         temperature: float = 0.0,
         seed: int | None = 0,
         extra_system: str | None = None,
+        cache_prompt: bool | None = None,
     ) -> None:
         self.tools = tools
         self.base_url = base_url
@@ -26,6 +27,7 @@ class LocalLLM:
         self.temperature = temperature
         self.seed = seed
         self.extra_system = extra_system
+        self.cache_prompt = cache_prompt
         self.calls_made = 0
         self.parse_failures = 0
         self.quiet_failures = 0
@@ -48,6 +50,11 @@ class LocalLLM:
             timeout=self.timeout,
             temperature=self.temperature,
             **({"seed": self.seed} if self.seed is not None else {}),
+            **(
+                {"cache_prompt": self.cache_prompt}
+                if self.cache_prompt is not None
+                else {}
+            ),
         )
         if out.get("error"):
             self.errors += 1

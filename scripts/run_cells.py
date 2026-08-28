@@ -38,6 +38,7 @@ def make_factory(a, rep):
             model=a.model,
             temperature=a.temperature,
             seed=a.seed + rep,
+            cache_prompt=False if getattr(a, "no_cache_prompt", False) else None,
         )
 
     return factory
@@ -88,6 +89,11 @@ def main() -> int:
         default=[],
         choices=sorted(LAYERS),
         help="harness layers applied to every selected loop (e.g. --layers todo → react+todo)",
+    )
+    ap.add_argument(
+        "--no-cache-prompt",
+        action="store_true",
+        help="ask the server not to reuse its prompt cache between requests",
     )
     ap.add_argument("--model", default="gemma-4-E4B-it-qat-q4_0")
     ap.add_argument("--base-url", default="http://127.0.0.1:8080/v1")

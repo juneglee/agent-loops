@@ -192,3 +192,22 @@ def test_transport_error_after_all_attempts_is_reported(monkeypatch):
     out = mod.call(base_url="http://x/v1", model="m", messages=[], tools=[])
 
     assert out["parse_ok"] is False and "ConnectionError" in out["error"]
+
+
+def test_local_llm_forwards_cache_prompt_only_when_set(monkeypatch):
+    from agent_loops.bench.core import local_llm as mod
+
+    seen = []
+
+    def spy(**kwargs):
+        seen.append(kwargs)
+        return {"tool_calls": None, "text": "", "parse_ok": True}
+
+    monkeypatch.setattr(mod, "call", spy)
+    mod.LocalLLM([], base_url="http://x/v1")([{"role": "user", "content": "hi"}])
+    mod.LocalLLM([], base_url="http://x/v1", cache_prompt=False)(
+        [{"role": "user", "content": "hi"}]
+    )
+
+    assert "cache_prompt" not in seen[0]
+    assert seen[1]["cache_prompt"] is False
