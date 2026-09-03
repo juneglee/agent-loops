@@ -5,7 +5,7 @@ import pytest
 from agent_loops.bench.bfcl.adapter import load_cases, load_ground_truth
 from agent_loops.bench.bfcl.runner import run_case
 from agent_loops.compose import adaptive, hierarchical, routed
-from agent_loops.loops import react
+from agent_loops.loops import dfsdt, react
 from tests.replay.bfcl import GateReplay, HierarchicalReplay, ReActReplay
 
 pytestmark = pytest.mark.integration
@@ -60,3 +60,23 @@ def test_gt_through_routed_react_scores_correct():
     assert result.n_recorded_tool_calls == result.n_tool_calls
     gt = load_ground_truth(CATEGORY)[_first_case()["id"]]
     assert result.n_llm_calls == len(gt) + sum(len(t) + 1 for t in gt)
+
+
+def test_gt_through_planner_dfsdt_scores_correct():
+    run = hierarchical(
+        dfsdt, max_rounds=5, worker_kwargs={"breadth": 2, "max_calls": 40}
+    )
+    result, expected = _anchor(run, HierarchicalReplay)
+
+    assert result.valid is True, f"replayed ground truth judged wrong: {result.error}"
+    assert result.n_tool_calls == expected
+    assert result.n_recorded_tool_calls == result.n_tool_calls
+
+
+def test_gt_through_routed_dfsdt_scores_correct():
+    run = routed(dfsdt, worker_kwargs={"breadth": 2, "max_calls": 40})
+    result, expected = _anchor(run, GateReplay)
+
+    assert result.valid is True, f"replayed ground truth judged wrong: {result.error}"
+    assert result.n_tool_calls == expected
+    assert result.n_recorded_tool_calls == result.n_tool_calls

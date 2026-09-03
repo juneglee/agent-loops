@@ -53,6 +53,8 @@ _COMPOSED = [
         routed(react, worker_kwargs={"max_steps": 6}),
         routed(single_call),
         routed(codeact, worker_kwargs={"max_steps": 4}),
+        hierarchical(dfsdt, worker_kwargs={"breadth": 2, "max_calls": 12}),
+        routed(dfsdt, worker_kwargs={"breadth": 2, "max_calls": 12}),
     )
 ]
 LOOPS.update({m.NAME: m for m in _COMPOSED})

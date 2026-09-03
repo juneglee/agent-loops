@@ -26,7 +26,7 @@
 | `reflexion` | trial → feedback → 언어적 reflection → memory → 다음 trial | [2303.11366](https://arxiv.org/abs/2303.11366) | [noahshinn/reflexion](https://github.com/noahshinn/reflexion) |
 | `dfsdt` | branch 탐색 → 포기 시 sibling 분기 → 막히면 backtracking 하는 DFS | [2307.16789](https://arxiv.org/abs/2307.16789) | [OpenBMB/ToolBench](https://github.com/OpenBMB/ToolBench) |
 
-### 오케스트레이션 조합 (9)
+### 오케스트레이션 조합 (11)
 
 코어 루프를 worker 로 두고 그 실행을 상위에서 제어하는 구조다. worker 구현은 수정 없이 그대로 사용한다.
 
@@ -36,7 +36,7 @@
 | `adaptive+<worker>` | worker 를 먼저 그대로 돌리고, 실패 선언이나 도구 오류가 나면 계획기가 개입해 분해 | `compose/adaptive.py` |
 | `routed+<worker>` | 게이트 1콜이 과제를 단순/복잡으로 판정해 단순이면 worker 직행, 복잡이면 planner 경로 | `compose/routed.py` |
 
-worker: `react`, `single_call`, `codeact`
+worker: `react`, `single_call`, `codeact`, `dfsdt` (`dfsdt` 는 `planner`, `routed` 만)
 
 ### 하네스 기능 (2)
 
