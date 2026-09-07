@@ -1,6 +1,6 @@
 from typing import ClassVar
 
-from scripts.run_single import measure_case
+from scripts.bfcl.run_single import measure_case
 
 
 class _FakeLLM:
@@ -12,7 +12,7 @@ class _FakeLLM:
 
 
 def test_each_repeat_gets_a_fresh_llm_and_uncontaminated_counters(monkeypatch):
-    import scripts.run_single as mod
+    import scripts.bfcl.run_single as mod
 
     monkeypatch.setattr(mod, "LocalLLM", _FakeLLM)
     monkeypatch.setattr(mod, "single_tools", lambda case: [])

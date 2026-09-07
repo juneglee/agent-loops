@@ -2,7 +2,7 @@ from types import SimpleNamespace
 
 
 def test_run_cells_factory_gives_each_repeat_its_own_seed(monkeypatch):
-    import scripts.run_cells as rc
+    import scripts.bfcl.run_cells as rc
 
     made: list[dict] = []
     monkeypatch.setattr(rc, "LocalLLM", lambda tools, **kw: made.append(kw) or object())
@@ -17,7 +17,7 @@ def test_run_cells_factory_gives_each_repeat_its_own_seed(monkeypatch):
 
 
 def test_run_single_measure_case_offsets_seed_per_repeat(monkeypatch):
-    import scripts.run_single as rs
+    import scripts.bfcl.run_single as rs
 
     made: list[dict] = []
     monkeypatch.setattr(

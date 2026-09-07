@@ -8,7 +8,7 @@ pytestmark = pytest.mark.integration
 
 
 def _registry_names() -> list[str]:
-    import scripts.run_cells as rc
+    import scripts.bfcl.run_cells as rc
 
     layered, _ = rc.with_layers(dict(rc.LOOPS), ["todo"])
     return [*rc.LOOPS, *layered]

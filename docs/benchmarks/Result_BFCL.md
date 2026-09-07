@@ -9,7 +9,7 @@
 | 도구 | BFCL 과제가 정의한 함수(GorillaFileSystem 등), 도구 세트 `t1` |
 | 과제 | BFCL v4 `multi_turn_base` 중 파일 관리 26과제 |
 | 채점 | `bfcl-eval` 공식 채점기. 최종 파일 상태가 정답 상태와 같으면 성공 |
-| 실행 | `python scripts/run_cells.py --cells <칸> --loops <루프>` (조합은 `planner+react` 처럼, 하네스는 `--layers todo`) |
+| 실행 | `python scripts/bfcl/run_cells.py --cells <칸> --loops <루프>` (조합은 `planner+react` 처럼, 하네스는 `--layers todo`) |
 | 코드 | 24139fd |
 
 ## 결과

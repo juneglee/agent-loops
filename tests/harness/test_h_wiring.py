@@ -33,7 +33,7 @@ def test_with_layers_is_a_noop_without_layers():
 
 
 def test_make_factory_appends_layer_tool_schemas(monkeypatch):
-    import scripts.run_cells as rc
+    import scripts.bfcl.run_cells as rc
 
     made: list[dict] = []
     monkeypatch.setattr(
