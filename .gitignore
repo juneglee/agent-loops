@@ -228,3 +228,4 @@ data/tasks/private/
 results/traces/
 results/tasks/
 .DS_Store
+results/

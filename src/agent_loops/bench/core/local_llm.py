@@ -176,4 +176,23 @@ def _serialize(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if role == "tool":
             role, text = "user", f"[observation] {text}"
         out.append({"role": role, "content": text})
-    return out
+    return _merge_adjacent_assistant(out)
+
+
+def _merge_adjacent_assistant(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    merged: list[dict[str, Any]] = []
+    for m in messages:
+        last = merged[-1] if merged else None
+        if (
+            last is not None
+            and m.get("role") == "assistant"
+            and last.get("role") == "assistant"
+            and not last.get("tool_calls")
+        ):
+            text = "\n".join(t for t in (last.get("content"), m.get("content")) if t)
+            last["content"] = text
+            if m.get("tool_calls"):
+                last["tool_calls"] = m["tool_calls"]
+            continue
+        merged.append(dict(m))
+    return merged
