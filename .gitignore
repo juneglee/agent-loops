@@ -220,7 +220,8 @@ __marimo__/
 
 # project
 models/
-/docs/
+/docs/*
+!/docs/benchmarks/
 /notes/
 data/tasks/generic_v1/
 data/tasks/private/
