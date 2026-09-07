@@ -1,0 +1,41 @@
+[
+  {
+    "id": "c001",
+    "fixture": "fx_basic",
+    "cell": "single_turn_single_step",
+    "turns": ["Find every markdown file in the workspace"],
+    "gt_calls": [[{"name": "Glob", "arguments": {"pattern": "**/*.md"}}]],
+    "expect": {"answer_contains": ["docs/a.md"]},
+    "tags": ["Glob", "query"]
+  },
+  {
+    "id": "c002",
+    "fixture": "fx_basic",
+    "cell": "single_turn_multi_step",
+    "turns": ["Read notes.txt and append the line 'reviewed' to it"],
+    "gt_calls": [[
+      {"name": "Read", "arguments": {"file_path": "notes.txt"}},
+      {"name": "Bash", "arguments": {"command": "printf 'reviewed\\n' >> notes.txt"}}
+    ]],
+    "expect": {},
+    "tags": ["Read", "Bash", "write"]
+  },
+  {
+    "id": "c003",
+    "fixture": "fx_basic",
+    "cell": "multi_turn_multi_step",
+    "turns": [
+      "Move docs/b.txt into a new folder called archive",
+      "Now create archive/README.md with the single line 'moved b.txt here'"
+    ],
+    "gt_calls": [
+      [
+        {"name": "Bash", "arguments": {"command": "mkdir -p archive"}},
+        {"name": "Bash", "arguments": {"command": "mv docs/b.txt archive/"}}
+      ],
+      [{"name": "Write", "arguments": {"file_path": "archive/README.md", "content": "moved b.txt here\n"}}]
+    ],
+    "expect": {},
+    "tags": ["Bash", "Write", "move"]
+  }
+]

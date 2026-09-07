@@ -7,6 +7,7 @@ from agent_loops.bench.core.registry import Stack
 from agent_loops.bench.core.runner import Budgets, CaseResult, Runner
 from agent_loops.bench.tasks.score import final_answer
 from agent_loops.bench.tasks.track import TaskTrack
+from agent_loops.tools import TOOLS_VERSION
 
 __all__ = ["final_answer", "run_task_case"]
 
@@ -21,12 +22,13 @@ def run_task_case(
     code_timeout: float = 5.0,
     bash_timeout: float = 10.0,
     trace_sink: Any = None,
+    tools_version: str = TOOLS_VERSION,
 ) -> CaseResult:
     stack = Stack(
         name=loop_module.NAME, run=loop_module.run, kwargs=dict(loop_kwargs or {})
     )
     runner = Runner(
-        TaskTrack(Path(base)),
+        TaskTrack(Path(base), tools_version=tools_version),
         llm_factory,
         Budgets(code_timeout=code_timeout, bash_timeout=bash_timeout),
         trace_sink=trace_sink,

@@ -24,7 +24,7 @@ from agent_loops.bench.core.runner import Budgets, Runner, pass_at_k, summarize
 from agent_loops.bench.prompts import INSTRUCTION_VARIANTS, apply_variant
 from agent_loops.bench.tasks.format import CELLS
 from agent_loops.bench.tasks.track import TaskTrack
-from agent_loops.tools import TOOLS_VERSION
+from agent_loops.tools import TOOL_VERSIONS, TOOLS_VERSION
 
 
 def _trace_sink(path: Path):
@@ -85,8 +85,9 @@ def run_dataset(
     out_dir: Path = Path("results/tasks"),
     llm_factory: Any = None,
     cache_prompt: bool | None = None,
+    tools_version: str = TOOLS_VERSION,
 ) -> list[Path]:
-    track = TaskTrack(Path(tasks_path))
+    track = TaskTrack(Path(tasks_path), tools_version=tools_version)
     prompt_version = apply_variant(instruction_variant)
     registry, extra_tools = with_layers({n: LOOPS[n] for n in loops}, layers)
     cases_all = track.all_cases()
@@ -122,7 +123,7 @@ def run_dataset(
         out.parent.mkdir(parents=True, exist_ok=True)
         print(
             f"\n### {set_name} / {cell}: {len(cases)} cases, {len(registry)} stacks, prompt {prompt_version} "
-            f",  tools {TOOLS_VERSION} | {revision}\n",
+            f",  tools {tools_version} | {revision}\n",
             flush=True,
         )
         results: dict[str, list] = {}
@@ -177,7 +178,7 @@ def run_dataset(
                         "model": model,
                         "all_classes": False,
                         "prompt_version": prompt_version,
-                        "tools_version": TOOLS_VERSION,
+                        "tools_version": tools_version,
                         "dataset": revision,
                         "n_cases": len(cases),
                         "config": full_config(
@@ -217,6 +218,12 @@ def main() -> int:
     ap.add_argument(
         "--instruction-variant", default=None, choices=sorted(INSTRUCTION_VARIANTS)
     )
+    ap.add_argument(
+        "--tools",
+        default=TOOLS_VERSION,
+        choices=list(TOOL_VERSIONS),
+        help="tool set given to the model (t1 = original names, fs_tool = Read/Write/Edit/Bash/Glob/Grep)",
+    )
     ap.add_argument("--code-timeout", type=float, default=5.0)
     ap.add_argument("--bash-timeout", type=float, default=10.0)
     ap.add_argument(
@@ -244,6 +251,7 @@ def main() -> int:
         a.base_url,
         Path(a.out_dir),
         cache_prompt=False if a.no_cache_prompt else None,
+        tools_version=a.tools,
     )
     return 0
 

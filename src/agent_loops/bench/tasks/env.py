@@ -11,19 +11,19 @@ from pathlib import Path
 from typing import Any
 
 from agent_loops.tools.fs import TEXT_SUFFIXES, ToolError
-from agent_loops.tools.toolset import Toolset
+from agent_loops.tools.toolset import TOOLS_VERSION, Toolset
 
 _REPO = Path(__file__).resolve().parents[3]
 
 _CODE_RUNNER = r"""
 import json, sys, traceback
 from pathlib import Path
-root, code_path, calls_path, repo = sys.argv[1:5]
+root, code_path, calls_path, repo, version = sys.argv[1:6]
 sys.path.insert(0, repo)
 from agent_loops.tools import implementations
 calls = []
 namespace = {"__name__": "__codeact__"}
-for _name, _fn in implementations(root).items():
+for _name, _fn in implementations(root, version=version).items():
     def _make(name, fn):
         def wrapper(*args, **kwargs):
             if args:
@@ -80,6 +80,7 @@ class WorkspaceEnv:
         code_timeout: float = 5.0,
         bash_timeout: float = 10.0,
         toolset_factory: Any = None,
+        tools_version: str = TOOLS_VERSION,
     ) -> None:
         self.fixture_dir = Path(fixture_dir).resolve() if fixture_dir else None
         self._tmp = Path(tempfile.mkdtemp(prefix="ws_"))
@@ -94,8 +95,9 @@ class WorkspaceEnv:
         self._toolset = (
             toolset_factory(self.root)
             if toolset_factory is not None
-            else Toolset(self.root, bash_timeout=bash_timeout)
+            else Toolset(self.root, bash_timeout=bash_timeout, version=tools_version)
         )
+        self.tools_version = self._toolset.version
         self._snapshots: dict[str, Path] = {}
         self._code_enabled = False
         self._initial = self.snapshot()
@@ -155,6 +157,7 @@ class WorkspaceEnv:
                     str(code_path),
                     str(calls_path),
                     str(_REPO),
+                    self.tools_version,
                 ],
                 cwd=self.root,
                 env=env,

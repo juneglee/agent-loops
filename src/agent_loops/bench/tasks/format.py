@@ -5,9 +5,11 @@ import json
 from pathlib import Path
 from typing import Any
 
-from agent_loops.tools import schemas
+from agent_loops.tools import TOOL_VERSIONS, schemas
 
-KNOWN_TOOLS = frozenset(s["function"]["name"] for s in schemas()) | {"execute_code"}
+KNOWN_TOOLS = frozenset(
+    s["function"]["name"] for v in TOOL_VERSIONS for s in schemas(v)
+) | {"execute_code"}
 CELLS = (
     "single_turn_single_step",
     "single_turn_multi_step",

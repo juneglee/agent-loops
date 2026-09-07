@@ -6,6 +6,7 @@ from typing import Any
 
 from agent_loops.bench.tasks.env import WorkspaceEnv
 from agent_loops.bench.tasks.format import fixture_dir
+from agent_loops.tools import TOOLS_VERSION
 
 
 def _ignored(path: str, patterns: list[str]) -> bool:
@@ -26,9 +27,12 @@ def _filtered(state: dict[str, str], ignore: list[str]) -> dict[str, str]:
 
 
 def expected_state(
-    fixture: Path | str, gt_calls: list[list[dict[str, Any]]], ignore: list[str]
+    fixture: Path | str,
+    gt_calls: list[list[dict[str, Any]]],
+    ignore: list[str],
+    tools_version: str = TOOLS_VERSION,
 ) -> dict[str, str]:
-    env = WorkspaceEnv(fixture)
+    env = WorkspaceEnv(fixture, tools_version=tools_version)
     try:
         for turn in gt_calls:
             for call in turn:
@@ -58,7 +62,12 @@ def score(
 ) -> tuple[bool, str | None]:
     expect = case.get("expect", {}) or {}
     ignore = list(expect.get("ignore", []))
-    expected = expected_state(fixture_dir(case, base), case["gt_calls"], ignore)
+    expected = expected_state(
+        fixture_dir(case, base),
+        case["gt_calls"],
+        ignore,
+        getattr(env, "tools_version", TOOLS_VERSION),
+    )
     diffs = compare(expected, _filtered(env.state(), ignore))
     if diffs:
         more = f" (+{len(diffs) - 3})" if len(diffs) > 3 else ""

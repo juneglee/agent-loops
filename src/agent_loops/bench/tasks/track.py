@@ -6,7 +6,7 @@ from typing import Any
 from agent_loops.bench.tasks.env import WorkspaceEnv
 from agent_loops.bench.tasks.format import dataset_revision, fixture_dir, load_tasks
 from agent_loops.bench.tasks.score import final_answer, score
-from agent_loops.tools import schemas
+from agent_loops.tools import TOOLS_VERSION, schemas
 
 
 def truncated(case: dict[str, Any], n_turns: int | None) -> dict[str, Any]:
@@ -19,8 +19,9 @@ def truncated(case: dict[str, Any], n_turns: int | None) -> dict[str, Any]:
 
 
 class TaskTrack:
-    def __init__(self, path: Path | str) -> None:
+    def __init__(self, path: Path | str, tools_version: str = TOOLS_VERSION) -> None:
         path = Path(path)
+        self.tools_version = tools_version
         self.tasks_path = path / "tasks.json" if path.is_dir() else path
         self.base = self.tasks_path.parent
         self.name = f"tasks:{self.base.name}"
@@ -41,13 +42,14 @@ class TaskTrack:
         return list(case["turns"])
 
     def tools_for(self, case: dict[str, Any]) -> list[dict[str, Any]]:
-        return schemas()
+        return schemas(self.tools_version)
 
     def make_env(self, case: dict[str, Any], budgets: Any) -> WorkspaceEnv:
         return WorkspaceEnv(
             fixture_dir(case, self.base),
             code_timeout=budgets.code_timeout,
             bash_timeout=budgets.bash_timeout,
+            tools_version=self.tools_version,
         )
 
     def score(
