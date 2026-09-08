@@ -33,6 +33,7 @@ class LocalLLM:
         self.quiet_failures = 0
         self.truncations = 0
         self.errors = 0
+        self.last_error: str | None = None
 
     def __call__(
         self, messages: list[dict[str, Any]], want: str = "tool_calls", **_: Any
@@ -58,6 +59,7 @@ class LocalLLM:
         )
         if out.get("error"):
             self.errors += 1
+            self.last_error = str(out["error"])[:300]
         if not out.get("parse_ok", True):
             self.parse_failures += 1
         if out.get("quiet_failure"):

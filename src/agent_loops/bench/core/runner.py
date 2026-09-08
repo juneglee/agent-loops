@@ -41,6 +41,7 @@ class CaseResult:
     quiet_failures: int = 0
     truncations: int = 0
     n_llm_errors: int = 0
+    llm_error: str | None = None
     terminated_by: list[str] = field(default_factory=list)
     seconds: float = 0.0
     tps: float = 0.0
@@ -125,6 +126,7 @@ def account(result: CaseResult, env: Any, llm: Any, turn_traces: list[Any]) -> N
     result.quiet_failures = getattr(llm, "quiet_failures", 0)
     result.truncations = getattr(llm, "truncations", 0)
     result.n_llm_errors = getattr(llm, "errors", 0)
+    result.llm_error = getattr(llm, "last_error", None)
     result.tps = _tps_of(turn_traces)
 
 

@@ -46,15 +46,16 @@ def load_mcpmark(path: Path | str) -> list[dict[str, Any]]:
 def run_verifier(
     verify_path: Path | str, workspace: Path | str
 ) -> tuple[bool, str | None]:
+    verify_path = Path(verify_path).resolve()
     env = {
         **os.environ,
-        "FILESYSTEM_TEST_DIR": str(workspace),
+        "FILESYSTEM_TEST_DIR": str(Path(workspace).resolve()),
         "PYTHONIOENCODING": "utf-8",
     }
     try:
         done = subprocess.run(
             [sys.executable, str(verify_path)],
-            cwd=str(Path(verify_path).parent),
+            cwd=str(verify_path.parent),
             env=env,
             timeout=VERIFY_TIMEOUT,
             capture_output=True,

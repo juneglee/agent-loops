@@ -55,3 +55,29 @@ def test_verifier_fails_when_the_agent_does_nothing():
 
     assert result.valid is False
     assert result.error.startswith("verify: exit 1")
+
+
+def test_verifier_runs_from_a_relative_dataset_path(monkeypatch, tmp_path):
+    import os
+    import shutil
+
+    target = tmp_path / "mini"
+    shutil.copytree(MINI, target)
+    monkeypatch.chdir(tmp_path)
+    case = load_tasks(Path("mini"))[0]
+    llm = ScriptedLLM([_tc("Write", file_path="note.txt", content="done\n"), _final()])
+
+    result = run_task_case(
+        case, react, lambda tools: llm, Path("mini"), tools_version="fs_tool"
+    )
+
+    assert result.valid is True, result.error
+    assert os.getcwd() == str(tmp_path)
+
+
+def test_run_dataset_can_override_the_step_budget(tmp_path):
+    from scripts.run_tasks import _budget
+
+    assert _budget({"max_steps": 10}, 30) == {"max_steps": 30}
+    assert _budget({"max_rounds": 5}, 30) == {"max_rounds": 5}
+    assert _budget({"max_steps": 10}, None) == {"max_steps": 10}

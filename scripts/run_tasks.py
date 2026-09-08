@@ -68,6 +68,13 @@ def _trace_sink(path: Path):
     return sink
 
 
+def _budget(kwargs: dict[str, Any], max_steps: int | None) -> dict[str, Any]:
+    out = dict(kwargs)
+    if max_steps is not None and "max_steps" in out:
+        out["max_steps"] = max_steps
+    return out
+
+
 def run_dataset(
     tasks_path: Path,
     cells: list[str],
@@ -86,6 +93,7 @@ def run_dataset(
     llm_factory: Any = None,
     cache_prompt: bool | None = None,
     tools_version: str = TOOLS_VERSION,
+    max_steps: int | None = None,
 ) -> list[Path]:
     track = TaskTrack(Path(tasks_path), tools_version=tools_version)
     prompt_version = apply_variant(instruction_variant)
@@ -147,7 +155,7 @@ def run_dataset(
                     stack = Stack(
                         name=name,
                         run=registry[name].run,
-                        kwargs=dict(kwargs_for(name)),
+                        kwargs=_budget(kwargs_for(name), max_steps),
                         layers=tuple(layers),
                     )
                     res = Runner(track, factory, budgets, trace_sink=sink).run_case(
@@ -224,6 +232,12 @@ def main() -> int:
         choices=list(TOOL_VERSIONS),
         help="tool set given to the model (t1 = original names, fs_tool = Read/Write/Edit/Bash/Glob/Grep)",
     )
+    ap.add_argument(
+        "--max-steps",
+        type=int,
+        default=None,
+        help="override the per-turn step budget of loops that have one (react, codeact, ...)",
+    )
     ap.add_argument("--code-timeout", type=float, default=5.0)
     ap.add_argument("--bash-timeout", type=float, default=10.0)
     ap.add_argument(
@@ -252,6 +266,7 @@ def main() -> int:
         Path(a.out_dir),
         cache_prompt=False if a.no_cache_prompt else None,
         tools_version=a.tools,
+        max_steps=a.max_steps,
     )
     return 0
 

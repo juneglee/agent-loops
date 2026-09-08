@@ -211,3 +211,22 @@ def test_local_llm_forwards_cache_prompt_only_when_set(monkeypatch):
 
     assert "cache_prompt" not in seen[0]
     assert seen[1]["cache_prompt"] is False
+
+
+def test_local_llm_keeps_the_last_transport_error_text(monkeypatch):
+    from agent_loops.bench.core import local_llm as mod
+
+    monkeypatch.setattr(
+        mod,
+        "call",
+        lambda **_k: {
+            "tool_calls": None,
+            "text": "",
+            "parse_ok": False,
+            "error": "ReadTimeout: slow",
+        },
+    )
+    llm = mod.LocalLLM([], base_url="http://x/v1")
+    llm([{"role": "user", "content": "hi"}])
+
+    assert llm.errors == 1 and llm.last_error == "ReadTimeout: slow"
