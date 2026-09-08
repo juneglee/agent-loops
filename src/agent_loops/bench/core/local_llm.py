@@ -19,6 +19,7 @@ class LocalLLM:
         seed: int | None = 0,
         extra_system: str | None = None,
         cache_prompt: bool | None = None,
+        max_tokens: int | None = None,
     ) -> None:
         self.tools = tools
         self.base_url = base_url
@@ -28,6 +29,7 @@ class LocalLLM:
         self.seed = seed
         self.extra_system = extra_system
         self.cache_prompt = cache_prompt
+        self.max_tokens = max_tokens
         self.calls_made = 0
         self.parse_failures = 0
         self.quiet_failures = 0
@@ -56,6 +58,7 @@ class LocalLLM:
                 if self.cache_prompt is not None
                 else {}
             ),
+            **({"max_tokens": self.max_tokens} if self.max_tokens is not None else {}),
         )
         if out.get("error"):
             self.errors += 1

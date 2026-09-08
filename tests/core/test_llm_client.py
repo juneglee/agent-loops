@@ -230,3 +230,39 @@ def test_local_llm_keeps_the_last_transport_error_text(monkeypatch):
     llm([{"role": "user", "content": "hi"}])
 
     assert llm.errors == 1 and llm.last_error == "ReadTimeout: slow"
+
+
+def test_timeouts_are_not_retried(monkeypatch):
+    import requests
+
+    from agent_loops.bench.core import llm as mod
+
+    attempts = []
+
+    def slow(*_a, **_k):
+        attempts.append(1)
+        raise requests.ReadTimeout("slow")
+
+    monkeypatch.setattr(requests, "post", slow)
+    monkeypatch.setattr(mod.time, "sleep", lambda _s: None)
+
+    out = mod.call(base_url="http://x/v1", model="m", messages=[], tools=[])
+
+    assert len(attempts) == 1 and "ReadTimeout" in out["error"]
+
+
+def test_local_llm_forwards_max_tokens_and_timeout(monkeypatch):
+    from agent_loops.bench.core import local_llm as mod
+
+    seen = {}
+
+    def spy(**kwargs):
+        seen.update(kwargs)
+        return {"tool_calls": None, "text": "", "parse_ok": True}
+
+    monkeypatch.setattr(mod, "call", spy)
+    mod.LocalLLM([], base_url="http://x/v1", timeout=300, max_tokens=4096)(
+        [{"role": "user", "content": "hi"}]
+    )
+
+    assert seen["timeout"] == 300 and seen["max_tokens"] == 4096

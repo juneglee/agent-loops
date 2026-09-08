@@ -110,6 +110,10 @@ def call(
             return parse_response(resp.json())
         except Exception as exc:  # noqa: BLE001
             last_error = exc
+            if not isinstance(exc, requests.ConnectionError) or isinstance(
+                exc, requests.Timeout
+            ):
+                break
             if attempt + 1 < TRANSPORT_ATTEMPTS:
                 time.sleep(TRANSPORT_BACKOFF_SECONDS * (attempt + 1))
     return {

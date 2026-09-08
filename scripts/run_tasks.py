@@ -94,6 +94,8 @@ def run_dataset(
     cache_prompt: bool | None = None,
     tools_version: str = TOOLS_VERSION,
     max_steps: int | None = None,
+    llm_timeout: float = 120.0,
+    max_tokens: int | None = None,
 ) -> list[Path]:
     track = TaskTrack(Path(tasks_path), tools_version=tools_version)
     prompt_version = apply_variant(instruction_variant)
@@ -116,6 +118,8 @@ def run_dataset(
                 temperature=temperature,
                 seed=seed + rep,
                 cache_prompt=cache_prompt,
+                timeout=llm_timeout,
+                max_tokens=max_tokens,
             )
 
         return factory
@@ -238,6 +242,18 @@ def main() -> int:
         default=None,
         help="override the per-turn step budget of loops that have one (react, codeact, ...)",
     )
+    ap.add_argument(
+        "--llm-timeout",
+        type=float,
+        default=120.0,
+        help="seconds to wait for one model response",
+    )
+    ap.add_argument(
+        "--max-tokens",
+        type=int,
+        default=None,
+        help="cap on generated tokens per model response (server default when omitted)",
+    )
     ap.add_argument("--code-timeout", type=float, default=5.0)
     ap.add_argument("--bash-timeout", type=float, default=10.0)
     ap.add_argument(
@@ -267,6 +283,8 @@ def main() -> int:
         cache_prompt=False if a.no_cache_prompt else None,
         tools_version=a.tools,
         max_steps=a.max_steps,
+        llm_timeout=a.llm_timeout,
+        max_tokens=a.max_tokens,
     )
     return 0
 
