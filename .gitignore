@@ -229,3 +229,4 @@ results/traces/
 results/tasks/
 .DS_Store
 results/
+data/tasks/mcpmark_fs/fixtures/

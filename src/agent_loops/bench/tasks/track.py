@@ -22,8 +22,12 @@ class TaskTrack:
     def __init__(self, path: Path | str, tools_version: str = TOOLS_VERSION) -> None:
         path = Path(path)
         self.tools_version = tools_version
-        self.tasks_path = path / "tasks.json" if path.is_dir() else path
-        self.base = self.tasks_path.parent
+        if path.is_dir() and not (path / "tasks.json").exists():
+            self.tasks_path = path
+            self.base = path
+        else:
+            self.tasks_path = path / "tasks.json" if path.is_dir() else path
+            self.base = self.tasks_path.parent
         self.name = f"tasks:{self.base.name}"
         self._cases: list[dict[str, Any]] | None = None
 

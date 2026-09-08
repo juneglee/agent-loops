@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from agent_loops.bench.tasks.mcpmark import is_mcpmark_dir, load_mcpmark
 from agent_loops.tools import TOOL_VERSIONS, schemas
 
 KNOWN_TOOLS = frozenset(
@@ -54,6 +55,11 @@ def validate(case: dict[str, Any], base: Path) -> None:
             case,
             f"gt_calls length ({len(case.get('gt_calls', []))}) differs from turns length ({len(case['turns'])})",
         )
+    verify = (case.get("expect") or {}).get("verify")
+    if verify is not None and (
+        not isinstance(verify, str) or not (base / verify).is_file()
+    ):
+        _fail(case, "expect.verify must point to an existing script")
     for turn in case["gt_calls"]:
         if not isinstance(turn, list):
             _fail(case, "each turn in gt_calls must be a list of calls")
@@ -71,7 +77,11 @@ def validate(case: dict[str, Any], base: Path) -> None:
     if not fixture_dir(case, base).is_dir():
         _fail(case, f"fixture directory does not exist: {case['fixture']}")
     derived = cell_of(case)
-    if "cell" in case and case["cell"] != derived:
+    if (
+        "cell" in case
+        and case["cell"] != derived
+        and "verify" not in (case.get("expect") or {})
+    ):
         _fail(
             case,
             f"declared cell ({case['cell']}) differs from the cell derived from gt_calls ({derived})",
@@ -89,12 +99,17 @@ def validate(case: dict[str, Any], base: Path) -> None:
 
 def load_tasks(path: Path | str) -> list[dict[str, Any]]:
     path = Path(path)
-    cases = json.loads(path.read_text(encoding="utf-8"))
+    if is_mcpmark_dir(path):
+        cases = load_mcpmark(path)
+        base = path
+    else:
+        cases = json.loads(path.read_text(encoding="utf-8"))
+        base = path.parent
     if not isinstance(cases, list):
         raise ValueError(f"{path}: must be an array of cases")  # noqa: TRY004
     seen: set[str] = set()
     for case in cases:
-        validate(case, path.parent)
+        validate(case, base)
         if case["id"] in seen:
             _fail(case, "duplicate id")
         seen.add(case["id"])
@@ -106,5 +121,11 @@ def load_tasks(path: Path | str) -> list[dict[str, Any]]:
 
 def dataset_revision(path: Path | str) -> str:
     path = Path(path)
+    if path.is_dir():
+        h = hashlib.sha256()
+        for f in sorted(path.glob("*/*/*/*.*")):
+            h.update(f.relative_to(path).as_posix().encode())
+            h.update(f.read_bytes())
+        return f"tasks:{path.name}@{h.hexdigest()[:12]}"
     digest = hashlib.sha256(path.read_bytes()).hexdigest()[:12]
     return f"tasks:{path.parent.name}@{digest}"
