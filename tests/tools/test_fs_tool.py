@@ -39,9 +39,7 @@ def test_schema_argument_names_follow_cli_agent_conventions():
 def test_read_returns_numbered_lines_and_pages_with_offset_and_limit(tmp_path):
     t = _ws(tmp_path)
     whole = t.call("Read", {"file_path": "docs/a.md"})
-    assert whole.splitlines()[0].endswith("\thello") and whole.splitlines()[
-        0
-    ].strip().startswith("1")
+    assert whole == "hello\nworld\nhello again"
     part = t.call("Read", {"file_path": "docs/a.md", "offset": 2, "limit": 1})
     assert part.splitlines()[0].strip().startswith("2") and "world" in part
     assert "more lines" in part and "offset=3" in part
@@ -132,8 +130,11 @@ def test_bash_honours_the_timeout_argument(tmp_path):
 def test_glob_matches_recursively_and_reports_no_files(tmp_path):
     t = _ws(tmp_path)
     found = t.call("Glob", {"pattern": "**/*.md"})
-    assert found.splitlines() == ["docs/a.md"]
-    assert t.call("Glob", {"pattern": "*.txt", "path": "docs"}) == "docs/b.txt"
+    assert found.splitlines() == ["docs/a.md", "(1 files)"]
+    assert (
+        t.call("Glob", {"pattern": "*.txt", "path": "docs"}).splitlines()[0]
+        == "docs/b.txt"
+    )
     assert t.call("Glob", {"pattern": "*.py"}) == "No files found"
 
 

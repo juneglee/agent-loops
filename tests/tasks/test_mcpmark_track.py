@@ -81,3 +81,34 @@ def test_run_dataset_can_override_the_step_budget(tmp_path):
     assert _budget({"max_steps": 10}, 30) == {"max_steps": 30}
     assert _budget({"max_rounds": 5}, 30) == {"max_rounds": 5}
     assert _budget({"max_steps": 10}, None) == {"max_steps": 10}
+
+
+def test_track_system_note_names_the_workspace_root():
+    from agent_loops.bench.tasks.track import TaskTrack
+
+    note = TaskTrack(MINI).system_note({})
+
+    assert "workspace root" in note and "test directory" in note
+
+
+def test_workspace_note_reaches_the_local_llm_system_messages(monkeypatch):
+    from agent_loops.bench.core import local_llm as mod
+
+    seen = []
+
+    def spy(**kwargs):
+        seen.append(kwargs["messages"])
+        return {"tool_calls": None, "text": "Final: done", "parse_ok": True}
+
+    monkeypatch.setattr(mod, "call", spy)
+    case = load_tasks(MINI)[0]
+    run_task_case(
+        case,
+        react,
+        lambda tools: mod.LocalLLM(tools, base_url="http://x/v1"),
+        MINI,
+        tools_version="fs_tool",
+    )
+
+    systems = [m["content"] for m in seen[0] if m["role"] == "system"]
+    assert any("workspace root" in c for c in systems)

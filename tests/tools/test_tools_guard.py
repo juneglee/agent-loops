@@ -71,3 +71,19 @@ def test_blocked_carries_a_reason_the_model_can_read():
     with pytest.raises(Blocked) as exc:
         check("bash", {"command": "curl http://x"}, "/tmp")
     assert "curl" in str(exc.value)
+
+
+@pytest.mark.parametrize(
+    "cmd",
+    [
+        "sed -n 's/a/b/p' x.txt",
+        "awk -F'\"' '/\\\"output\\\":/ {print $4}' x.txt",
+        'for f in *.txt; do cat "$f"; done',
+        "find . -type f | xargs wc -l",
+        "grep -c x a.txt | tee count.txt",
+        'FILE=a.txt; cat "$FILE"',
+        'LONG="abc def"; grep -F "$LONG" b.txt',
+    ],
+)
+def test_guard_allows_text_processing_and_shell_control(tmp_path, cmd):
+    check("bash", {"command": cmd}, tmp_path)

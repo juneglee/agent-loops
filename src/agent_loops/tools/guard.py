@@ -47,7 +47,56 @@ ALLOWED_PROGRAMS = frozenset(
         "printf",
         "stat",
         "date",
+        "sed",
+        "awk",
+        "xargs",
+        "tee",
+        "paste",
+        "seq",
+        "bc",
+        "rev",
+        "fold",
+        "nl",
+        "expr",
+        "readlink",
+        "realpath",
+        "file",
+        "md5",
+        "shasum",
+        "cmp",
+        "comm",
+        "for",
+        "do",
+        "done",
+        "while",
+        "if",
+        "then",
+        "else",
+        "elif",
+        "fi",
+        "in",
+        "exit",
+        "export",
     }
+)
+_ROOTS = (
+    "/etc",
+    "/usr",
+    "/bin",
+    "/sbin",
+    "/var",
+    "/tmp",
+    "/private",
+    "/Users",
+    "/home",
+    "/opt",
+    "/dev",
+    "/root",
+    "/proc",
+    "/sys",
+    "/Library",
+    "/System",
+    "/Applications",
 )
 _SEPARATORS = {"|", "||", "&&", ";", "(", ")", "{", "}"}
 _DENY_PATTERNS = [
@@ -59,6 +108,7 @@ _DENY_PATTERNS = [
         r"\$\(|`",
     )
 ]
+_ASSIGNMENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
 _PATH_KEYS = ("path", "source", "destination", "file_path", "dir_path")
 
 
@@ -73,7 +123,15 @@ def _programs(cmd: str) -> list[str]:
         if token in _SEPARATORS:
             expect_head = True
             continue
+        if token.endswith(";"):
+            token = token[:-1]
+            if expect_head and token and not _ASSIGNMENT.match(token):
+                heads.append(token)
+            expect_head = True
+            continue
         if expect_head:
+            if _ASSIGNMENT.match(token):
+                continue
             heads.append(token)
             expect_head = False
     return heads
@@ -99,7 +157,7 @@ class Guard:
                     raise Blocked(f"blocked command pattern: {cmd}")
             for token in _tokens(cmd):
                 if token.startswith("~") or (
-                    token.startswith("/") and not token.startswith(str(root))
+                    token.startswith(_ROOTS) and not token.startswith(str(root))
                 ):
                     raise Blocked(f"path outside the workspace: {token}")
             for program in _programs(cmd):

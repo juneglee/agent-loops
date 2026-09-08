@@ -66,6 +66,7 @@ def make(
             lines.pop()
         if not lines:
             return "(empty file)"
+        paged = offset is not None or limit is not None
         start = max(int(offset), 1) if offset else 1
         count = int(limit) if limit else DEFAULT_READ_LINES
         chosen = lines[start - 1 : start - 1 + count]
@@ -77,7 +78,7 @@ def make(
         for number, line in enumerate(chosen, start=start):
             if len(line) > MAX_LINE_CHARS:
                 line = line[:MAX_LINE_CHARS] + "... (line truncated)"
-            out.append(f"{number:6d}\t{line}")
+            out.append(f"{number:6d}\t{line}" if paged else line)
         remaining = len(lines) - (start - 1 + len(chosen))
         if remaining > 0:
             out.append(
@@ -176,6 +177,7 @@ def make(
             out.append(
                 f"... ({len(matches) - len(shown)} more files; narrow the pattern)"
             )
+        out.append(f"({len(matches)} files)")
         return "\n".join(out)
 
     def grep(
@@ -266,8 +268,8 @@ SCHEMAS: list[dict[str, Any]] = [
     _schema(
         "Read",
         "Reads a file from the local filesystem. The file_path must be a path inside the workspace. "
-        "By default it reads up to 2000 lines starting from the beginning of the file. "
-        "Results are returned with line numbers starting at 1 (line number, a tab, then the content). "
+        "By default it reads up to 2000 lines starting from the beginning of the file and returns the raw content. "
+        "When offset or limit is given, each line is prefixed with its line number and a tab; never copy that prefix into a file. "
         "Any lines longer than 2000 characters are truncated. PDFs are returned as extracted text. "
         "When you already know which part of the file you need, only read that part with offset and limit. "
         "You must read a file before you edit or overwrite it.",
@@ -346,7 +348,7 @@ SCHEMAS: list[dict[str, Any]] = [
     _schema(
         "Glob",
         'Fast file pattern matching tool. Supports glob patterns like "*.md" or "**/*.py" and '
-        "returns matching file paths sorted by modification time. "
+        "returns matching file paths sorted by modification time, followed by the total count. "
         "Use this tool when you need to find files by name patterns.",
         {
             "pattern": {
