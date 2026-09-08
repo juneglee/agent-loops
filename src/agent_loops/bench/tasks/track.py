@@ -18,13 +18,6 @@ def truncated(case: dict[str, Any], n_turns: int | None) -> dict[str, Any]:
     return out
 
 
-WORKSPACE_NOTE = (
-    "The workspace root is the current working directory. Phrases such as "
-    "'the test directory', 'the main directory' or 'the given directory' refer to it. "
-    "Use paths relative to it and do not create a folder for it."
-)
-
-
 class TaskTrack:
     def __init__(self, path: Path | str, tools_version: str = TOOLS_VERSION) -> None:
         path = Path(path)
@@ -51,9 +44,6 @@ class TaskTrack:
 
     def turns_of(self, case: dict[str, Any]) -> list[str]:
         return list(case["turns"])
-
-    def system_note(self, case: dict[str, Any]) -> str:
-        return WORKSPACE_NOTE
 
     def tools_for(self, case: dict[str, Any]) -> list[dict[str, Any]]:
         return schemas(self.tools_version)

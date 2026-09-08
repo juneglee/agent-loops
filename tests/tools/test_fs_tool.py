@@ -130,7 +130,7 @@ def test_bash_honours_the_timeout_argument(tmp_path):
 def test_glob_matches_recursively_and_reports_no_files(tmp_path):
     t = _ws(tmp_path)
     found = t.call("Glob", {"pattern": "**/*.md"})
-    assert found.splitlines() == ["docs/a.md", "(1 files)"]
+    assert found.splitlines() == ["docs/a.md"]
     assert (
         t.call("Glob", {"pattern": "*.txt", "path": "docs"}).splitlines()[0]
         == "docs/b.txt"

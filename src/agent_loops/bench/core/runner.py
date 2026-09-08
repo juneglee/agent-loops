@@ -158,9 +158,6 @@ class Runner:
         env = self.track.make_env(case, self.budgets)
         try:
             tools, extra_system = prepare(env, self.track.tools_for(case), stack.name)
-            note = getattr(self.track, "system_note", None)
-            if note is not None:
-                extra_system = "\n\n".join(x for x in (note(case), extra_system) if x)
             llm = self.llm_factory(tools)
             if extra_system is not None and hasattr(llm, "extra_system"):
                 llm.extra_system = extra_system

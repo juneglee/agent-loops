@@ -177,7 +177,6 @@ def make(
             out.append(
                 f"... ({len(matches) - len(shown)} more files; narrow the pattern)"
             )
-        out.append(f"({len(matches)} files)")
         return "\n".join(out)
 
     def grep(
@@ -293,7 +292,8 @@ SCHEMAS: list[dict[str, Any]] = [
         "Write",
         "Writes a file to the local filesystem, overwriting if one exists. "
         "Use it for creating a new file or fully replacing an existing one. "
-        "Missing parent folders are created. For partial changes, use Edit instead.",
+        "Missing parent folders are created. For partial changes, use Edit instead. "
+        "Always prefer editing existing files; never create new files unless the task explicitly requires them.",
         {
             "file_path": {
                 "type": "string",
@@ -348,7 +348,7 @@ SCHEMAS: list[dict[str, Any]] = [
     _schema(
         "Glob",
         'Fast file pattern matching tool. Supports glob patterns like "*.md" or "**/*.py" and '
-        "returns matching file paths sorted by modification time, followed by the total count. "
+        "returns matching file paths sorted by modification time. "
         "Use this tool when you need to find files by name patterns.",
         {
             "pattern": {
