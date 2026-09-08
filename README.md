@@ -89,7 +89,7 @@ python examples/demo.py
 | 추론 런타임 | `llama.cpp llama-server` (OpenAI 호환 API) — https://github.com/ggml-org/llama.cpp |
 | 런타임 설정 | `-c 32768 -ngl 99 -fa on --cache-reuse 256 --jinja` |
 | 내부 평가셋 | 실파일 워크스페이스 과제 (`tests/fixtures/samples`), 최종 파일 상태 기준 평가 |
-| 공개 파일관리 과제 | MCPMark Filesystem 40건 (`data/tasks/mcpmark_fs`, Apache-2.0, L1 10 / L3 30), 과제별 `verify.py` 로 평가 — https://github.com/eval-sys/mcpmark |
+| 공개 파일관리 과제 | MCPMark Filesystem 40건 (`data/tasks/mcpmark_fs`, 원 저작 eval-sys/mcpmark, Apache-2.0, L1 10 / L3 30), 워크스페이스 10종은 `scripts/fetch_mcpmark_fixtures.py` 로 내려받고 과제별 `verify.py` 로 평가 — https://github.com/eval-sys/mcpmark |
 | 외부 벤치마크 | BFCL v4 `multi_turn_base` 파일 관리 과제, `bfcl-eval` 공식 평가 방식 사용 — https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard |
 | 하드웨어 | MacBook Pro, Apple M2 Pro, 32 GB, Metal |
 
