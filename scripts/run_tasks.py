@@ -24,7 +24,7 @@ from agent_loops.bench.core.runner import Budgets, Runner, pass_at_k, summarize
 from agent_loops.bench.prompts import INSTRUCTION_VARIANTS, apply_variant
 from agent_loops.bench.tasks.format import CELLS
 from agent_loops.bench.tasks.track import TaskTrack
-from agent_loops.tools import TOOL_VERSIONS, TOOLS_VERSION
+from agent_loops.tools import TOOL_VERSIONS, TOOLS_VERSION, fs_tool
 
 
 def _trace_sink(path: Path):
@@ -120,6 +120,7 @@ def run_dataset(
                 cache_prompt=cache_prompt,
                 timeout=llm_timeout,
                 max_tokens=max_tokens,
+                plain_observations=tools_version == fs_tool.TOOLS_VERSION,
             )
 
         return factory

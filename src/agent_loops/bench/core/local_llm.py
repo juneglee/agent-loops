@@ -20,6 +20,7 @@ class LocalLLM:
         extra_system: str | None = None,
         cache_prompt: bool | None = None,
         max_tokens: int | None = None,
+        plain_observations: bool = False,
     ) -> None:
         self.tools = tools
         self.base_url = base_url
@@ -30,6 +31,7 @@ class LocalLLM:
         self.extra_system = extra_system
         self.cache_prompt = cache_prompt
         self.max_tokens = max_tokens
+        self.plain_observations = plain_observations
         self.calls_made = 0
         self.parse_failures = 0
         self.quiet_failures = 0
@@ -48,7 +50,7 @@ class LocalLLM:
         out = call(
             base_url=self.base_url,
             model=self.model,
-            messages=_serialize(prepared),
+            messages=_serialize(prepared, plain_observations=self.plain_observations),
             tools=None if text_mode else self.tools,
             timeout=self.timeout,
             temperature=self.temperature,
@@ -115,7 +117,17 @@ def _as_text(content: Any) -> str:
     return json.dumps(content, ensure_ascii=False, default=str)
 
 
-def _serialize(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _observation_text(content: Any) -> str:
+    if isinstance(content, dict) and "ok" in content:
+        if content.get("ok"):
+            return _as_text(content.get("output", ""))
+        return f"Error: {content.get('error') or 'tool failed'}"
+    return _as_text(content)
+
+
+def _serialize(
+    messages: list[dict[str, Any]], plain_observations: bool = False
+) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
     pending_ids: list[str] = []
     counter = 0
@@ -166,7 +178,11 @@ def _serialize(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 {
                     "role": "tool",
                     "tool_call_id": pending_ids.pop(0),
-                    "content": _as_text(content),
+                    "content": (
+                        _observation_text(content)
+                        if plain_observations
+                        else _as_text(content)
+                    ),
                 }
             )
             continue

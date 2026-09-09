@@ -186,3 +186,52 @@ def test_assistant_after_a_tool_result_is_not_merged():
     out = _serialize(messages)
 
     assert [m["role"] for m in out] == ["user", "assistant", "tool", "assistant"]
+
+
+def test_plain_observations_send_tool_output_as_bare_text():
+    messages = [
+        {"role": "user", "content": "read it"},
+        {
+            "role": "assistant",
+            "content": {
+                "tool_calls": [{"name": "Read", "arguments": {"file_path": "a"}}]
+            },
+        },
+        {"role": "tool", "content": {"ok": True, "error": None, "output": "line one"}},
+    ]
+    out = _serialize(messages, plain_observations=True)
+    assert out[-1]["role"] == "tool"
+    assert out[-1]["content"] == "line one"
+
+
+def test_plain_observations_render_failures_as_error_lines():
+    messages = [
+        {"role": "user", "content": "read it"},
+        {
+            "role": "assistant",
+            "content": {
+                "tool_calls": [{"name": "Read", "arguments": {"file_path": "a"}}]
+            },
+        },
+        {
+            "role": "tool",
+            "content": {"ok": False, "error": "no such file", "output": ""},
+        },
+    ]
+    out = _serialize(messages, plain_observations=True)
+    assert out[-1]["content"] == "Error: no such file"
+
+
+def test_observations_stay_json_by_default():
+    messages = [
+        {"role": "user", "content": "read it"},
+        {
+            "role": "assistant",
+            "content": {
+                "tool_calls": [{"name": "Read", "arguments": {"file_path": "a"}}]
+            },
+        },
+        {"role": "tool", "content": {"ok": True, "error": None, "output": "line one"}},
+    ]
+    out = _serialize(messages)
+    assert out[-1]["content"] == '{"ok": true, "error": null, "output": "line one"}'
