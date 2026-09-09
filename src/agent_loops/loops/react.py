@@ -16,7 +16,13 @@ from __future__ import annotations
 from typing import Any
 
 from agent_loops.bench.prompts import build_messages
-from agent_loops.loops.base import Step, Trace, calls_of, response_is_complete
+from agent_loops.loops.base import (
+    Step,
+    Trace,
+    calls_of,
+    response_is_complete,
+    response_is_empty,
+)
 
 NAME = "react"
 
@@ -34,6 +40,8 @@ def run(
 
         if not tool_calls:
             trace.steps.append(Step(llm_response=response))
+            if response_is_empty(response):
+                return trace.halt(response)
             if response_is_complete(response):
                 trace.terminated_by = "success"
                 return trace

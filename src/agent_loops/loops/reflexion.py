@@ -66,6 +66,7 @@ from agent_loops.loops.base import (
     calls_of,
     response_gives_up,
     response_is_complete,
+    response_is_empty,
 )
 
 NAME = "reflexion"
@@ -123,6 +124,9 @@ def _attempt(
 
         if not tool_calls:
             trace.steps.append(Step(llm_response=response))
+            if response_is_empty(response):
+                trace.halt(response)
+                return False, history
             history.append({"role": "assistant", "content": response})
             if response_is_complete(response):
                 return not had_error, history
@@ -181,6 +185,8 @@ def run(
         )
         if ok:
             return trace.stop("success")
+        if trace.halted:
+            return trace
 
         if trial < max_trials - 1:
             reflection = llm(

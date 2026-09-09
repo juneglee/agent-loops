@@ -53,6 +53,7 @@ from agent_loops.loops.base import (
     calls_of,
     response_gives_up,
     response_is_complete,
+    response_is_empty,
 )
 
 NAME = "adapt"
@@ -96,6 +97,9 @@ def _execute(
         tool_calls = response.get("tool_calls")
         if not tool_calls:
             trace.steps.append(Step(llm_response=response))
+            if response_is_empty(response):
+                trace.halt(response)
+                return False, done
             history.append({"role": "assistant", "content": response})
             if response_is_complete(response):
                 return True, done
@@ -164,6 +168,8 @@ def _solve(
     )
     if ok:
         return "success", done
+    if trace.halted:
+        return trace.terminated_by, []
     if budget["left"] <= 0:
         return "max_steps", []
     if depth >= max_depth:

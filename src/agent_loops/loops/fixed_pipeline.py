@@ -15,7 +15,7 @@ from __future__ import annotations
 from typing import Any
 
 from agent_loops.bench.prompts import build_messages
-from agent_loops.loops.base import Step, Trace, calls_of
+from agent_loops.loops.base import Step, Trace, calls_of, response_is_empty
 
 NAME = "fixed_pipeline"
 STAGES = ("locate", "act", "verify")
@@ -39,6 +39,8 @@ def run(task: str, env: Any, llm: Any, history: list | None = None) -> Trace:
 
         if not tool_calls:
             trace.steps.append(Step(llm_response=response, stage=stage))
+            if response_is_empty(response):
+                return trace.halt(response)
             history.append({"role": "assistant", "content": response})
             continue
 

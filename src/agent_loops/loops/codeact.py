@@ -44,7 +44,13 @@ from __future__ import annotations
 from typing import Any
 
 from agent_loops.bench.prompts import build_messages
-from agent_loops.loops.base import Step, Trace, calls_of, response_is_complete
+from agent_loops.loops.base import (
+    Step,
+    Trace,
+    calls_of,
+    response_is_complete,
+    response_is_empty,
+)
 
 NAME = "codeact"
 CODE_TOOL = "execute_code"
@@ -63,6 +69,8 @@ def run(
 
         if not tool_calls:
             trace.steps.append(Step(llm_response=response))
+            if response_is_empty(response):
+                return trace.halt(response)
             if response_is_complete(response):
                 return trace.stop("success")
             history.append({"role": "assistant", "content": response})

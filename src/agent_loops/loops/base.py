@@ -28,10 +28,18 @@ class Trace:
     steps: list[Step] = field(default_factory=list)
     parse_ok: bool = True
     terminated_by: str = "success"
+    halted: bool = False
 
     def stop(self, reason: str) -> Trace:
+        if self.halted:
+            return self
         self.terminated_by = reason
         self.parse_ok = reason not in ("parse_fail", "no_action")
+        return self
+
+    def halt(self, response: dict[str, Any]) -> Trace:
+        self.stop("truncated" if response.get("truncated") else "no_action")
+        self.halted = True
         return self
 
     @property
@@ -71,6 +79,16 @@ def response_is_complete(response: dict[str, Any]) -> bool:
         line.startswith("task completed") or _COMPLETE.match(line)
         for line in _declaration_lines(response.get("text", ""))
     )
+
+
+def response_is_empty(response: dict[str, Any]) -> bool:
+    return (
+        not response.get("tool_calls") and not str(response.get("text") or "").strip()
+    )
+
+
+def response_is_runaway(response: dict[str, Any]) -> bool:
+    return bool(response.get("truncated")) and response_is_empty(response)
 
 
 def response_gives_up(response: dict[str, Any]) -> bool:

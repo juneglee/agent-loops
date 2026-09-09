@@ -43,7 +43,13 @@ import re
 from typing import Any
 
 from agent_loops.bench.prompts import build_messages
-from agent_loops.loops.base import Step, Trace, calls_of, response_is_complete
+from agent_loops.loops.base import (
+    Step,
+    Trace,
+    calls_of,
+    response_is_complete,
+    response_is_runaway,
+)
 
 NAME = "plan_and_act"
 EXECUTOR = "plan_and_act_executor"
@@ -89,6 +95,8 @@ def run(
         )
         trace.steps.append(Step(llm_response=plan_response))
         plan_text = plan_response.get("text", "")
+        if response_is_runaway(plan_response):
+            return trace.halt(plan_response)
         if not parse_steps(plan_text):
             return trace.stop("parse_fail")
 
@@ -99,6 +107,8 @@ def run(
         calls = calls_of(exec_response)
         if not calls:
             trace.steps.append(Step(llm_response=exec_response))
+            if response_is_runaway(exec_response):
+                return trace.halt(exec_response)
             if response_is_complete(exec_response):
                 return trace.stop("success")
             rounds.append(

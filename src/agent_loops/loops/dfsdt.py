@@ -72,6 +72,7 @@ from agent_loops.loops.base import (
     calls_of,
     response_gives_up,
     response_is_complete,
+    response_is_runaway,
 )
 
 NAME = "dfsdt"
@@ -165,6 +166,9 @@ def run(
             ]
             if not calls:
                 trace.steps.append(Step(llm_response=response))
+                if response_is_runaway(response):
+                    trace.halt(response)
+                    return BUDGET
                 if response_is_complete(response):
                     return FINAL
                 if response_gives_up(response):
