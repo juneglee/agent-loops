@@ -7,6 +7,7 @@ from typing import Any
 
 from agent_loops.compose import adaptive, hierarchical, routed
 from agent_loops.harness import apply
+from agent_loops.harness.doom_loop import doom_loop
 from agent_loops.harness.todo import todo
 from agent_loops.harness.verifier import verifier
 from agent_loops.loops import (
@@ -75,7 +76,7 @@ def kwargs_for(name: str) -> dict:
     return LOOP_KWARGS.get(name) or LOOP_KWARGS.get(name.split("+")[0], {})
 
 
-LAYERS: dict[str, Any] = {"todo": todo, "verifier": verifier()}
+LAYERS: dict[str, Any] = {"todo": todo, "verifier": verifier(), "doom_loop": doom_loop}
 
 
 def with_layers(loops: dict, layer_names: list) -> tuple[dict, list]:
