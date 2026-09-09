@@ -179,7 +179,9 @@ def run_dataset(
             s = summarize(rows)
             print(
                 f"  {name}: accuracy {s['accuracy']:.1%} | LLM calls {s['mean_llm_calls']:.1f} | "
-                f"{s['mean_seconds']:.0f}s | {s['mean_tps']:.0f} tps\n",
+                f"{s['mean_seconds']:.0f}s | {s['mean_tps']:.0f} tps | "
+                + ", ".join(f"{k} {v}" for k, v in s["terminated_by"].items())
+                + "\n",
                 flush=True,
             )
             out.write_text(

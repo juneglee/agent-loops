@@ -98,3 +98,13 @@ def test_success_turns_without_tools_are_counted():
         CaseResult(case_id="y", loop="react", n_success_turns_without_tools=0),
     ]
     assert summarize(rows)["mean_success_turns_without_tools"] == 1.0
+
+
+def test_summary_counts_termination_reasons():
+    a = CaseResult(case_id="a", loop="l", n_llm_calls=1, terminated_by=["success"])
+    b = CaseResult(case_id="b", loop="l", n_llm_calls=1, terminated_by=["truncated"])
+    c = CaseResult(case_id="c", loop="l", n_llm_calls=1, terminated_by=["success"])
+
+    s = summarize([a, b, c])
+
+    assert s["terminated_by"] == {"success": 2, "truncated": 1}

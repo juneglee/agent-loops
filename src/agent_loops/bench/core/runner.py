@@ -215,7 +215,16 @@ def summarize(results: list[CaseResult]) -> dict[str, Any]:
         / n,
         "mean_seconds": sum(r.seconds for r in results) / n,
         "mean_tps": sum(r.tps for r in results) / n,
+        "terminated_by": _reason_counts(results),
     }
+
+
+def _reason_counts(results: list[CaseResult]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for r in results:
+        for reason in r.terminated_by:
+            counts[reason] = counts.get(reason, 0) + 1
+    return dict(sorted(counts.items()))
 
 
 def pass_at_k(rows: list[CaseResult]) -> dict[str, Any]:
