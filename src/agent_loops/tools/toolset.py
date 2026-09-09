@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
@@ -11,7 +12,11 @@ TOOL_VERSIONS = ("t1", fs_tool.TOOLS_VERSION)
 
 
 def _build(
-    version: str, root: Path, bash_timeout: float, guard: Guard
+    version: str,
+    root: Path,
+    bash_timeout: float,
+    guard: Guard,
+    seen_paths: Iterable[str] = (),
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     if version == "t1":
         impl = {
@@ -21,7 +26,7 @@ def _build(
         return impl, [*fs.FS_SCHEMAS, shell.BASH_SCHEMA]
     if version == fs_tool.TOOLS_VERSION:
         return fs_tool.make(
-            root, bash_timeout=bash_timeout, guard=guard
+            root, bash_timeout=bash_timeout, guard=guard, seen_paths=seen_paths
         ), fs_tool.SCHEMAS
     raise ValueError(f"unknown tools version: {version}")
 
@@ -43,11 +48,14 @@ class Toolset:
         guard: Guard | None = None,
         bash_timeout: float = 10.0,
         version: str = TOOLS_VERSION,
+        seen_paths: Iterable[str] = (),
     ) -> None:
         self.root = Path(root).resolve()
         self.guard = guard or DEFAULT_GUARD
         self.version = version
-        self._impl, source = _build(version, self.root, bash_timeout, self.guard)
+        self._impl, source = _build(
+            version, self.root, bash_timeout, self.guard, seen_paths
+        )
         self._schemas = [dict(s, function=dict(s["function"])) for s in source]
 
     def schemas(self) -> list[dict[str, Any]]:

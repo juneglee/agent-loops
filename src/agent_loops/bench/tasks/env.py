@@ -18,12 +18,13 @@ _REPO = Path(__file__).resolve().parents[3]
 _CODE_RUNNER = r"""
 import json, sys, traceback
 from pathlib import Path
-root, code_path, calls_path, repo, version = sys.argv[1:6]
+root, code_path, calls_path, repo, version, seen_path = sys.argv[1:7]
 sys.path.insert(0, repo)
 from agent_loops.tools import implementations
 calls = []
+seen = json.loads(Path(seen_path).read_text(encoding="utf-8"))
 namespace = {"__name__": "__codeact__"}
-for _name, _fn in implementations(root, version=version).items():
+for _name, _fn in implementations(root, version=version, seen_paths=seen).items():
     def _make(name, fn):
         def wrapper(*args, **kwargs):
             if args:
@@ -139,13 +140,15 @@ class WorkspaceEnv:
                 "calls": [],
             }
         work = Path(tempfile.mkdtemp(prefix="code_", dir=self._tmp))
-        runner, code_path, calls_path = (
+        runner, code_path, calls_path, seen_path = (
             work / "runner.py",
             work / "code.py",
             work / "calls.json",
+            work / "seen.json",
         )
         runner.write_text(_CODE_RUNNER, encoding="utf-8")
         code_path.write_text(code, encoding="utf-8")
+        seen_path.write_text(json.dumps(self._seen_paths()), encoding="utf-8")
         env = {**os.environ, "PYTHONPATH": str(_REPO), "PYTHONIOENCODING": "utf-8"}
         try:
             done = subprocess.run(
@@ -158,6 +161,7 @@ class WorkspaceEnv:
                     str(calls_path),
                     str(_REPO),
                     self.tools_version,
+                    str(seen_path),
                 ],
                 cwd=self.root,
                 env=env,
@@ -189,6 +193,15 @@ class WorkspaceEnv:
                 "calls": inner,
             }
         return {"ok": True, "error": None, "output": done.stdout, "calls": inner}
+
+    def _seen_paths(self) -> list[str]:
+        out: list[str] = []
+        for call in self.calls:
+            if call.get("name") in ("Read", "Write"):
+                path = (call.get("arguments") or {}).get("file_path")
+                if path:
+                    out.append(str(path))
+        return out
 
     def state(self) -> dict[str, str]:
         out: dict[str, str] = {}

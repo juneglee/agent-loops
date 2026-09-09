@@ -93,3 +93,16 @@ def test_execute_code_reports_traceback_and_respects_timeout(tmp_path):
     assert bad["ok"] is False and "nope" in bad["error"]
     slow = env.execute("execute_code", {"code": "while True: pass"})
     assert slow["ok"] is False and "timeout" in slow["error"].lower()
+
+
+def test_edit_read_gate_survives_across_code_blocks(tmp_path):
+    env = WorkspaceEnv(_fixture(tmp_path), tools_version="fs_tool")
+    env.enable_code_execution()
+    first = env.execute("execute_code", {"code": "Read(file_path='docs/a.md')"})
+    assert first["ok"]
+    second = env.execute(
+        "execute_code",
+        {"code": "print(Edit(file_path='docs/a.md', old_string='A', new_string='B'))"},
+    )
+    assert second["ok"], second["error"]
+    assert "replaced" in second["output"]

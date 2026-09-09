@@ -14,7 +14,7 @@ from __future__ import annotations
 import fnmatch
 import re
 import subprocess
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from pathlib import Path
 from typing import Any
 
@@ -35,10 +35,11 @@ def make(
     root: Path | str,
     bash_timeout: float = DEFAULT_BASH_TIMEOUT,
     guard: Guard | None = None,
+    seen_paths: Iterable[str] = (),
 ) -> dict[str, Callable[..., str]]:
     root = Path(root).resolve()
     guard = guard or DEFAULT_GUARD
-    seen: set[Path] = set()
+    seen: set[Path] = {(root / p).resolve() for p in seen_paths}
 
     def _rel(target: Path) -> str:
         return target.relative_to(root).as_posix()
