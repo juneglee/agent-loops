@@ -118,7 +118,7 @@ def test_bash_runs_inside_the_workspace_and_reports_exit_codes(tmp_path):
     with pytest.raises(ToolError, match="Exit code"):
         t.call("Bash", {"command": "ls missing_dir"})
     with pytest.raises(ToolError, match="blocked"):
-        t.call("Bash", {"command": "curl http://example.com"})
+        t.call("Bash", {"command": "cat /etc/passwd"})
 
 
 def test_bash_honours_the_timeout_argument(tmp_path):
@@ -187,3 +187,29 @@ def test_workspace_env_and_replay_use_the_selected_version(tmp_path):
             tools_version="fs_tool",
         )
         assert result.valid is True, f"{cid}: {result.error}"
+
+
+@pytest.mark.parametrize(
+    "cmd",
+    [
+        "python3 -c 'print(1)'",
+        "split -b 120 large.txt part_",
+        "for i in 1 2 3; do echo $(( i * 2 )); done",
+        "echo `date`",
+        "cat <<'EOF' > s.sh\n#!/bin/bash\necho hi\nEOF",
+    ],
+)
+def test_fs_tool_bash_does_not_restrict_programs(tmp_path, cmd):
+    (tmp_path / "large.txt").write_text("x" * 500)
+    tools = implementations(tmp_path, version="fs_tool")
+    tools["Bash"](command=cmd)
+
+
+@pytest.mark.parametrize(
+    "cmd",
+    ["rm -rf /", "cat /etc/passwd", "cd .. && ls", "ls ~", "echo x > /dev/sda"],
+)
+def test_fs_tool_bash_still_blocks_escapes_and_destruction(tmp_path, cmd):
+    tools = implementations(tmp_path, version="fs_tool")
+    with pytest.raises(ToolError):
+        tools["Bash"](command=cmd)

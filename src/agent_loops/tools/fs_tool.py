@@ -19,7 +19,7 @@ from pathlib import Path
 from typing import Any
 
 from agent_loops.tools.fs import ToolError, _guarded, _is_text, _read_pdf
-from agent_loops.tools.guard import DEFAULT_GUARD, Blocked, Guard
+from agent_loops.tools.guard import PATH_GUARD, Blocked, Guard
 
 TOOLS_VERSION = "fs_tool"
 DEFAULT_READ_LINES = 2000
@@ -38,7 +38,7 @@ def make(
     seen_paths: Iterable[str] = (),
 ) -> dict[str, Callable[..., str]]:
     root = Path(root).resolve()
-    guard = guard or DEFAULT_GUARD
+    guard = guard or PATH_GUARD
     seen: set[Path] = {(root / p).resolve() for p in seen_paths}
 
     def _rel(target: Path) -> str:

@@ -105,9 +105,9 @@ _DENY_PATTERNS = [
         r"\brm\s+-[a-zA-Z]*r[a-zA-Z]*\s+/(\s|$)",
         r"(^|[;&|(]\s*)cd\s+\.\.",
         r">\s*/dev/",
-        r"\$\(|`",
     )
 ]
+_DENY_SUBSTITUTION = re.compile(r"\$\(|`")
 _ASSIGNMENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
 _PATH_KEYS = ("path", "source", "destination", "file_path", "dir_path")
 
@@ -145,8 +145,12 @@ def _tokens(cmd: str) -> list[str]:
 
 
 class Guard:
-    def __init__(self, allowed_programs: frozenset[str] = ALLOWED_PROGRAMS) -> None:
-        self.allowed_programs = frozenset(allowed_programs)
+    def __init__(
+        self, allowed_programs: frozenset[str] | None = ALLOWED_PROGRAMS
+    ) -> None:
+        self.allowed_programs = (
+            None if allowed_programs is None else frozenset(allowed_programs)
+        )
 
     def check(self, name: str, arguments: dict | None, root: Path | str) -> None:
         root = Path(root).resolve()
@@ -155,11 +159,15 @@ class Guard:
             for pattern in _DENY_PATTERNS:
                 if pattern.search(cmd):
                     raise Blocked(f"blocked command pattern: {cmd}")
+            if self.allowed_programs is not None and _DENY_SUBSTITUTION.search(cmd):
+                raise Blocked(f"blocked command pattern: {cmd}")
             for token in _tokens(cmd):
                 if token.startswith("~") or (
                     token.startswith(_ROOTS) and not token.startswith(str(root))
                 ):
                     raise Blocked(f"path outside the workspace: {token}")
+            if self.allowed_programs is None:
+                return
             for program in _programs(cmd):
                 if program not in self.allowed_programs:
                     raise Blocked(f"program not in the allow list: {program}")
@@ -174,6 +182,7 @@ class Guard:
 
 
 DEFAULT_GUARD = Guard()
+PATH_GUARD = Guard(allowed_programs=None)
 
 
 def check(name: str, arguments: dict | None, root: Path | str) -> None:

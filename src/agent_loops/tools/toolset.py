@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from agent_loops.tools import fs, fs_tool, shell
-from agent_loops.tools.guard import DEFAULT_GUARD, Blocked, Guard
+from agent_loops.tools.guard import DEFAULT_GUARD, PATH_GUARD, Blocked, Guard
 
 TOOLS_VERSION = "t1"
 TOOL_VERSIONS = ("t1", fs_tool.TOOLS_VERSION)
@@ -51,7 +51,9 @@ class Toolset:
         seen_paths: Iterable[str] = (),
     ) -> None:
         self.root = Path(root).resolve()
-        self.guard = guard or DEFAULT_GUARD
+        self.guard = guard or (
+            PATH_GUARD if version == fs_tool.TOOLS_VERSION else DEFAULT_GUARD
+        )
         self.version = version
         self._impl, source = _build(
             version, self.root, bash_timeout, self.guard, seen_paths
