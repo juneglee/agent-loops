@@ -1,0 +1,626 @@
+[
+ {
+  "id": "intercode/fs1_011",
+  "fixture": "fixtures/fs_1",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Compress in parallel regular files in the testbed directory tree that were last modified more than 7 days ago"
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "find testbed -type f  -mtime +7 | tee compressedP.list | xargs -I{} -P10 compress {} &"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs1_015",
+  "fixture": "fixtures/fs_1",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Copies all files with \"FooBar\" in the path under the 'testbed/dir1' directory to the 'testbed/dir3/subdir1/subsubdir1/tmp' directory."
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "find testbed -name '*FooBar*' -print0 | xargs -0 -I{} cp -R {} testbed/dir3/subdir1/subsubdir1/tmp"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs1_019",
+  "fixture": "fixtures/fs_1",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Copy all files below the testbed directory whose names contain \"FooBar\" to directory 'testbed/dir3/subdir1/subsubdir1/tmp'"
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "find testbed -name '*FooBar*' -print0 | xargs -0 -I{} cp -R {} testbed/dir3/subdir1/subsubdir1/tmp"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs1_044",
+  "fixture": "fixtures/fs_1",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Create an empty file \"abc.txt\" in each directory named \"dir1\" under testbed directory."
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "find testbed -type d -name \"dir1\" -print |  sed 's/$/\\/abc.txt/g' | xargs touch"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs1_047",
+  "fixture": "fixtures/fs_1",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Delete and count files in \"testbed/dir3/subdir1/subsubdir1/tmp\" that are older than 2 days"
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "find testbed/dir3/subdir1/subsubdir1/tmp -type f -mtime +2 -print0 | xargs -0 rm -f"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs2_005",
+  "fixture": "fixtures/fs_2",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Recursively remove all \"*.txt\" files in the 'system' folder and answer \"y\" to any prompt"
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "yes y | rm -r system/*.txt"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs2_006",
+  "fixture": "fixtures/fs_2",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Recursively removes all empty folders from the system/folder3/temp folder."
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "find system/folder3/temp -depth -type d -exec rmdir {} \\;"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs2_008",
+  "fixture": "fixtures/fs_2",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Recursively removes all files in the system/folder1 folder but '*txt' files."
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "find system/folder1 -type f -not -name '*txt' | xargs rm"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs2_014",
+  "fixture": "fixtures/fs_2",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Remove all *.doc files from the system/folder1 tree"
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "find system/folder1 -name '*.doc' -exec rm \"{}\" \\;"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs2_015",
+  "fixture": "fixtures/fs_2",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Remove all *.log files from the system/folder1 tree"
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "find system/folder1 -name '*.log' -print0 | xargs -0 rm"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs2_016",
+  "fixture": "fixtures/fs_2",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Remove all *.txt files in 'system' directory but not in it's subdirectories"
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "find system -maxdepth 1 -name '*.txt' -maxdepth 1 | xargs rm"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs2_017",
+  "fixture": "fixtures/fs_2",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Remove all *.sql files in the 'system/folder3/backup_dbg' directory that were last modified more than 25 days ago"
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "find system/folder3/backup_dbg/*.sql -mtime +25 -exec rm -f {} \\;"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs2_020",
+  "fixture": "fixtures/fs_2",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Remove all .sh files in the 'system/folder1' tree whose names begin with \"new\""
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "find system/folder1 -name 'new*.sh' -exec rm -f '{}' \\;"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs2_021",
+  "fixture": "fixtures/fs_2",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Remove all a.out, *.o, and core files under the 'system' directory"
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "find system \\( -name a.out -o -name '*.o' -o -name 'core' \\) -exec rm {} \\;"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs2_024",
+  "fixture": "fixtures/fs_2",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Remove all empty files in system/folder3/temp and below"
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "find system/folder3/temp -type f -empty -print | xargs rm -f"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs2_025",
+  "fixture": "fixtures/fs_2",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Remove all files 'a.out' and *.o in the system directory tree that were modified more than 7 days ago"
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "find system \\( -name a.out -o -name '*.o' \\) -mtime +7 -exec rm {} \\;"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs2_032",
+  "fixture": "fixtures/fs_2",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Remove junk files modified more than 31 days ago recursively from \"system\""
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "find system -type f -mtime +31 -exec rm -f {} \\;"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs2_034",
+  "fixture": "fixtures/fs_2",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Remove regular files in the system directory tree"
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "find system -type f -print0 | xargs -0 -n1 echo rm | sh -x"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs2_039",
+  "fixture": "fixtures/fs_2",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "archive all files in system/folder1 directory modified in the last 60 days to \"/mytarfile.tgz\""
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "tar czvf mytarfile.tgz `find system/folder1 -mtime -60`"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs2_041",
+  "fixture": "fixtures/fs_2",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Remove files in the system directory tree modified more than 31 days ago recursively"
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "find system -type f -mtime +31 -print0 | xargs -0 -r rm -f"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs2_045",
+  "fixture": "fixtures/fs_2",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Copy all files in the system directory except those containing 'text' to 'system/folder3/backup_dbg/backup'."
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "find system -maxdepth 1 -type f -name '*text*' -exec cp {} system/folder3/backup_dbg/backup \\;"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs2_048",
+  "fixture": "fixtures/fs_2",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "create a compressed archive of system/folder1 \"compress_folder1.tar.gz\" with verbose output"
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "tar -zcvf compress_folder1.tar.gz system/folder1"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs3_038",
+  "fixture": "fixtures/fs_3",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Unhide all hidden files in the workspace directory"
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "find workspace -maxdepth 1 -type f -name '.*' -exec sh -c 'mv \"$0\" \"${0%/\\.*}/${0##*/.}\"' {} \\;"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs3_052",
+  "fixture": "fixtures/fs_3",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Create an empty file \"Icon\" with a carriage return character in the end of its name."
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "echo $'Icon\\r' | xargs touch"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs3_057",
+  "fixture": "fixtures/fs_3",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Unpack all *.gz archives in the workspace directory tree"
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "find workspace -name '*.gz' -print0 | xargs -0 gunzip"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ },
+ {
+  "id": "intercode/fs3_059",
+  "fixture": "fixtures/fs_3",
+  "cell": "single_turn_single_step",
+  "turns": [
+   "Create a symbolic link to \"workspace/dir1/terminate.txt\" named \"workspace/test\""
+  ],
+  "gt_calls": [
+   [
+    {
+     "name": "Bash",
+     "arguments": {
+      "command": "ln workspace/dir1/terminate.txt workspace/test"
+     }
+    }
+   ]
+  ],
+  "expect": {},
+  "tags": [
+   "intercode",
+   "state_change"
+  ],
+  "source": "intercode"
+ }
+]

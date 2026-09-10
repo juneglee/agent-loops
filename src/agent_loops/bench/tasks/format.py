@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from agent_loops.bench.tasks.intercode import is_intercode_dir, load_intercode
 from agent_loops.bench.tasks.mcpmark import is_mcpmark_dir, load_mcpmark
 from agent_loops.tools import TOOL_VERSIONS, schemas
 
@@ -101,6 +102,9 @@ def load_tasks(path: Path | str) -> list[dict[str, Any]]:
     path = Path(path)
     if is_mcpmark_dir(path):
         cases = load_mcpmark(path)
+        base = path
+    elif is_intercode_dir(path):
+        cases = load_intercode(path)
         base = path
     else:
         cases = json.loads(path.read_text(encoding="utf-8"))
