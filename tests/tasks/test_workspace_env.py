@@ -106,3 +106,30 @@ def test_edit_read_gate_survives_across_code_blocks(tmp_path):
     )
     assert second["ok"], second["error"]
     assert "replaced" in second["output"]
+
+
+def test_tar_gz_archives_are_compared_by_members_not_bytes(tmp_path):
+    env = WorkspaceEnv(_fixture(tmp_path), tools_version="fs_tool")
+    env.execute("Bash", {"command": "tar czf a.tgz docs"})
+    first = env.state()["a.tgz"]
+    import time
+
+    time.sleep(1.1)
+    env.execute("Bash", {"command": "tar czf a.tgz docs"})
+    assert env.state()["a.tgz"] == first
+    env.execute("Bash", {"command": "echo more >> docs/a.md && tar czf a.tgz docs"})
+    assert env.state()["a.tgz"] != first
+    env.close()
+
+
+def test_state_records_symlinks_by_target_even_when_dangling(tmp_path):
+    env = WorkspaceEnv(_fixture(tmp_path), tools_version="fs_tool")
+    env.execute(
+        "Bash", {"command": "ln -s docs/a.md link_ok && ln -s missing link_bad"}
+    )
+    state = env.state()
+    assert state["link_ok"] == state["link_ok"]
+    assert "link_bad" in state
+    env.execute("Bash", {"command": "rm link_bad && ln -s other link_bad"})
+    assert env.state()["link_bad"] != state["link_bad"]
+    env.close()

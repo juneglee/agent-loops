@@ -62,6 +62,22 @@ def _zip_digest(data: bytes) -> bytes | None:
     return json.dumps(entries, ensure_ascii=False).encode("utf-8")
 
 
+def _tar_digest(data: bytes) -> bytes | None:
+    import io
+    import tarfile
+
+    try:
+        with tarfile.open(fileobj=io.BytesIO(data), mode="r:*") as tf:
+            entries = []
+            for member in tf.getmembers():
+                content = tf.extractfile(member) if member.isfile() else None
+                digest = hashlib.sha256(content.read()).hexdigest() if content else ""
+                entries.append((member.name, member.type.decode(), digest))
+    except (tarfile.TarError, EOFError, OSError):
+        return None
+    return json.dumps(sorted(entries)).encode("utf-8")
+
+
 def _normalised_text(data: bytes) -> bytes | None:
     try:
         text = data.decode("utf-8")
@@ -212,12 +228,19 @@ class WorkspaceEnv:
                 out[(rel_dir / d).as_posix()] = "<dir>"
             for f in sorted(filenames):
                 path = Path(dirpath) / f
+                if path.is_symlink():
+                    target = os.readlink(path)
+                    out[(rel_dir / f).as_posix()] = f"<link:{target}>"
+                    continue
                 data = path.read_bytes()
                 if path.suffix.lower() in TEXT_SUFFIXES:
                     normalised = _normalised_text(data)
                     data = normalised if normalised is not None else data
                 elif path.suffix.lower() == ".zip":
                     digest = _zip_digest(data)
+                    data = digest if digest is not None else data
+                elif path.name.lower().endswith((".tar.gz", ".tgz", ".tar")):
+                    digest = _tar_digest(data)
                     data = digest if digest is not None else data
                 out[(rel_dir / f).as_posix()] = hashlib.sha256(data).hexdigest()
         return out
