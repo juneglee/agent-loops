@@ -80,3 +80,29 @@ def test_layers_rename_loops_and_are_recorded(tmp_path):
     )
     payload = json.loads(written[0].read_text(encoding="utf-8"))
     assert set(payload["summaries"]) == {"react+todo"} and payload["layers"] == ["todo"]
+
+
+def test_run_dataset_select_restricts_cases_by_id(tmp_path):
+    written = run_dataset(
+        tasks_path=SAMPLES / "tasks.json",
+        cells=["single_turn_single_step"],
+        loops=["react"],
+        layers=[],
+        limit=0,
+        repeats=1,
+        temperature=0.0,
+        seed=0,
+        instruction_variant=None,
+        code_timeout=5.0,
+        bash_timeout=10.0,
+        model="fake",
+        base_url="http://x",
+        out_dir=tmp_path / "results",
+        llm_factory=lambda case, name: (
+            lambda tools: UniversalReplay(case, replay_mode(name))
+        ),
+        select=["s001"],
+    )
+    payload = json.loads(written[0].read_text(encoding="utf-8"))
+    ids = {row["case_id"] for rows in payload["cases"].values() for row in rows}
+    assert ids == {"s001"}

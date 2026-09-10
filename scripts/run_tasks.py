@@ -96,11 +96,15 @@ def run_dataset(
     max_steps: int | None = None,
     llm_timeout: float = 120.0,
     max_tokens: int | None = None,
+    select: list[str] | None = None,
 ) -> list[Path]:
     track = TaskTrack(Path(tasks_path), tools_version=tools_version)
     prompt_version = apply_variant(instruction_variant)
     registry, extra_tools = with_layers({n: LOOPS[n] for n in loops}, layers)
     cases_all = track.all_cases()
+    if select:
+        wanted = set(select)
+        cases_all = [c for c in cases_all if c["id"] in wanted]
     set_name = track.base.name
     revision = track.revision()
     budgets = Budgets(code_timeout=code_timeout, bash_timeout=bash_timeout)
@@ -220,6 +224,13 @@ def run_dataset(
     return written
 
 
+def _read_ids(path: str | None) -> list[str] | None:
+    if not path:
+        return None
+    lines = Path(path).read_text(encoding="utf-8").splitlines()
+    return [line.strip() for line in lines if line.strip()]
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--tasks", default="data/tasks/generic_v1/tasks.json")
@@ -227,6 +238,7 @@ def main() -> int:
     ap.add_argument("--loops", nargs="*", default=list(LOOPS))
     ap.add_argument("--layers", nargs="*", default=[], choices=sorted(LAYERS))
     ap.add_argument("--limit", type=int, default=0, help="cases per cell (0 = all)")
+    ap.add_argument("--select", help="file with one task id per line")
     ap.add_argument("--repeats", type=int, default=1)
     ap.add_argument("--temperature", type=float, default=0.0)
     ap.add_argument("--seed", type=int, default=0)
@@ -288,6 +300,7 @@ def main() -> int:
         max_steps=a.max_steps,
         llm_timeout=a.llm_timeout,
         max_tokens=a.max_tokens,
+        select=_read_ids(a.select),
     )
     return 0
 
