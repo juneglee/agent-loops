@@ -282,7 +282,7 @@ SCHEMAS: list[dict[str, Any]] = [
         "When offset or limit is given, each line is prefixed with its line number and a tab; never copy that prefix into a file. "
         "Any lines longer than 2000 characters are truncated. PDFs are returned as extracted text. "
         "When you already know which part of the file you need, only read that part with offset and limit. "
-        "You must read a file before you edit or overwrite it.",
+        "You must read a file before you edit it.",
         {
             "file_path": {
                 "type": "string",
