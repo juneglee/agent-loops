@@ -221,3 +221,9 @@ def test_bash_home_is_outside_the_workspace_so_tool_caches_do_not_leak(tmp_path)
     assert home and not Path(home).resolve().is_relative_to(tmp_path.resolve())
     tools["Bash"](command="python3 -c 'print(1)'")
     assert not (tmp_path / "Library").exists()
+
+
+def test_bash_rejects_a_command_containing_a_null_byte(tmp_path):
+    tools = implementations(tmp_path, version="fs_tool")
+    with pytest.raises(ToolError, match="null"):
+        tools["Bash"](command="echo a\x00b")

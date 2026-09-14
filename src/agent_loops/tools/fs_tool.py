@@ -140,6 +140,8 @@ def make(
         )
 
     def bash(command: str, timeout: float | None = None) -> str:
+        if "\x00" in command:
+            raise ToolError("Command blocked: it contains a null byte")
         try:
             guard.check("bash", {"command": command}, root)
         except Blocked as exc:
