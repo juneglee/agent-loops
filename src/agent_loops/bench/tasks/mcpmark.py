@@ -71,5 +71,5 @@ def run_verifier(
         line.strip()
         for line in (done.stdout + done.stderr).splitlines()
         if line.strip()
-    )[-300:]
+    )
     return False, f"verify: exit {done.returncode}: {tail}"

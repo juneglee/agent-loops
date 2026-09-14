@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import json
+import shutil
 import time
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 from agent_loops.bench.core.codeact_setup import prepare
@@ -143,11 +145,13 @@ class Runner:
         llm_factory: Any,
         budgets: Budgets | None = None,
         trace_sink: Any = None,
+        keep_dir: Path | str | None = None,
     ) -> None:
         self.track = track
         self.llm_factory = llm_factory
         self.budgets = budgets or Budgets()
         self.trace_sink = trace_sink
+        self.keep_dir = Path(keep_dir) if keep_dir is not None else None
 
     def run_case(
         self, case: dict[str, Any], stack: Any, n_turns: int | None = None
@@ -175,11 +179,24 @@ class Runner:
                 result.valid = False
                 result.error = f"scorer:{type(exc).__name__}: {exc}"[:200]
         finally:
+            if self.keep_dir is not None and hasattr(env, "root"):
+                _keep(self.keep_dir / stack.name / case["id"], env.root, result)
             close = getattr(env, "close", None)
             if callable(close):
                 close()
         result.seconds = time.time() - started
         return result
+
+
+def _keep(target: Path, root: Path | str, result: CaseResult) -> None:
+    if target.exists():
+        shutil.rmtree(target)
+    shutil.copytree(root, target / "root", symlinks=True)
+    (target / "score.txt").write_text(
+        f"valid: {result.valid}\nterminated_by: {','.join(result.terminated_by)}\n"
+        f"error: {result.error or ''}\n",
+        encoding="utf-8",
+    )
 
 
 def summarize(results: list[CaseResult]) -> dict[str, Any]:

@@ -174,3 +174,29 @@ def test_tps_is_read_from_server_timings_when_present():
     )
 
     assert result.tps == 80.0 / 3
+
+
+def test_keep_dir_saves_the_final_workspace_and_score_for_inspection(tmp_path):
+    case = _case("s002")
+    calls = [c for turn in case["gt_calls"] for c in turn]
+    llm = ScriptedLLM(
+        [
+            {"tool_calls": [calls[0]]},
+            {"tool_calls": [calls[1]]},
+            {"tool_calls": None, "text": "Final: moved and created"},
+        ]
+    )
+    keep = tmp_path / "workspaces"
+
+    run_task_case(
+        case,
+        react,
+        lambda tools: llm,
+        BASE,
+        loop_kwargs={"max_steps": 5},
+        keep_dir=keep,
+    )
+
+    saved = keep / "react" / "s002"
+    assert (saved / "root").is_dir()
+    assert (saved / "score.txt").read_text(encoding="utf-8").startswith("valid: True")

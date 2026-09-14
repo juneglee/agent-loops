@@ -23,6 +23,7 @@ def run_task_case(
     bash_timeout: float = 10.0,
     trace_sink: Any = None,
     tools_version: str = TOOLS_VERSION,
+    keep_dir: Path | str | None = None,
 ) -> CaseResult:
     stack = Stack(
         name=loop_module.NAME, run=loop_module.run, kwargs=dict(loop_kwargs or {})
@@ -32,5 +33,6 @@ def run_task_case(
         llm_factory,
         Budgets(code_timeout=code_timeout, bash_timeout=bash_timeout),
         trace_sink=trace_sink,
+        keep_dir=keep_dir,
     )
     return runner.run_case(case, stack, n_turns=n_turns)

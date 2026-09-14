@@ -97,6 +97,7 @@ def run_dataset(
     llm_timeout: float = 120.0,
     max_tokens: int | None = None,
     select: list[str] | None = None,
+    keep_workspaces: bool = False,
 ) -> list[Path]:
     track = TaskTrack(Path(tasks_path), tools_version=tools_version)
     prompt_version = apply_variant(instruction_variant)
@@ -167,16 +168,22 @@ def run_dataset(
                         kwargs=_budget(kwargs_for(name), max_steps),
                         layers=tuple(layers),
                     )
-                    res = Runner(track, factory, budgets, trace_sink=sink).run_case(
-                        case, stack, n_turns=n_turns
-                    )
+                    res = Runner(
+                        track,
+                        factory,
+                        budgets,
+                        trace_sink=sink,
+                        keep_dir=(out_dir / "workspaces" / stamp)
+                        if keep_workspaces
+                        else None,
+                    ).run_case(case, stack, n_turns=n_turns)
                     res.run_index = rep
                     rows.append(res)
                     print(
                         f"  {name:20s} [{i}/{len(cases)}] {case['id']} "
                         f"{'valid' if res.valid else 'x'} | {res.n_llm_calls} calls | {res.seconds:.0f}s "
                         f",  {res.tps:.0f} tps | {','.join(res.terminated_by)}"
-                        f"{'' if res.valid else ' | ' + str(res.error)[:80]}",
+                        f"{'' if res.valid else ' | ' + str(res.error)[-120:]}",
                         flush=True,
                     )
             results[name] = rows
@@ -239,6 +246,7 @@ def main() -> int:
     ap.add_argument("--layers", nargs="*", default=[], choices=sorted(LAYERS))
     ap.add_argument("--limit", type=int, default=0, help="cases per cell (0 = all)")
     ap.add_argument("--select", help="file with one task id per line")
+    ap.add_argument("--keep-workspaces", action="store_true")
     ap.add_argument("--repeats", type=int, default=1)
     ap.add_argument("--temperature", type=float, default=0.0)
     ap.add_argument("--seed", type=int, default=0)
@@ -301,6 +309,7 @@ def main() -> int:
         llm_timeout=a.llm_timeout,
         max_tokens=a.max_tokens,
         select=_read_ids(a.select),
+        keep_workspaces=a.keep_workspaces,
     )
     return 0
 
