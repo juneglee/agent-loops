@@ -53,12 +53,8 @@ class Trace:
 
 _DECORATION = "*_`#>\"'“”「」[]() \t"
 
-_COMPLETE = re.compile(
-    r"^(?:(?:[^:：\n]{0,12}[,，]\s*)?(?:final|response)|최종|완료)\s*(?:답|answer)?\s*[:：]"
-)
-_GIVE_UP = re.compile(
-    r"^(?:i\s+)?(?:give up|giving up|task failed|포기)\s*(?:[:：—–\-]|[.!]?\s*$)"
-)
+_COMPLETE = re.compile(r"^final\s*:")
+_GIVE_UP = re.compile(r"^(?:give up|task failed)\s*(?::|[.!]?\s*$)")
 
 
 def _declaration_lines(text: Any) -> list[str]:
@@ -71,9 +67,7 @@ def _declaration_lines(text: Any) -> list[str]:
 
 
 def response_is_complete(response: dict[str, Any]) -> bool:
-    if response.get("completed") is True or response.get("done") is True:
-        return True
-    if response.get("final") is not None:
+    if response.get("done") is True:
         return True
     return any(
         line.startswith("task completed") or _COMPLETE.match(line)

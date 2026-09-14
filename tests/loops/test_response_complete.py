@@ -3,7 +3,8 @@ from agent_loops.loops.base import response_gives_up, response_is_complete
 
 def test_completion_marker_in_text_counts_as_complete():
     assert response_is_complete({"tool_calls": None, "text": "Final: moved two files"})
-    assert response_is_complete({"tool_calls": None, "text": "Response: done"})
+    assert not response_is_complete({"tool_calls": None, "text": "Response: done"})
+    assert not response_is_complete({"tool_calls": None, "text": "Final answer: done"})
     assert response_is_complete({"tool_calls": None, "text": "Task completed"})
 
 
@@ -14,9 +15,10 @@ def test_plain_text_without_marker_is_not_complete():
     assert not response_is_complete({"tool_calls": None, "text": "I cannot do this"})
 
 
-def test_structured_completion_fields_count_as_complete():
-    assert response_is_complete({"tool_calls": None, "text": "", "completed": True})
-    assert response_is_complete({"tool_calls": None, "text": "", "final": "done"})
+def test_only_the_harness_done_flag_counts_as_a_structured_completion():
+    assert response_is_complete({"tool_calls": None, "text": "", "done": True})
+    assert not response_is_complete({"tool_calls": None, "text": "", "completed": True})
+    assert not response_is_complete({"tool_calls": None, "text": "", "final": "done"})
 
 
 def test_marker_is_read_only_from_first_or_last_line():
