@@ -227,3 +227,29 @@ def test_bash_rejects_a_command_containing_a_null_byte(tmp_path):
     tools = implementations(tmp_path, version="fs_tool")
     with pytest.raises(ToolError, match="null"):
         tools["Bash"](command="echo a\x00b")
+
+
+@pytest.mark.parametrize(
+    "cmd",
+    [
+        "find / -type f -delete",
+        "find / -name a.out -mtime +7 -delete",
+        "ls /",
+        "rm -rf /Applications/x",
+        "find /Users -type f",
+        "cat /private/tmp/x",
+    ],
+)
+def test_fs_tool_bash_blocks_any_absolute_path_outside_the_workspace(tmp_path, cmd):
+    tools = implementations(tmp_path, version="fs_tool")
+    with pytest.raises(ToolError, match="outside the workspace"):
+        tools["Bash"](command=cmd)
+
+
+def test_fs_tool_bash_allows_absolute_paths_inside_the_workspace_and_dev_null(
+    tmp_path,
+):
+    tools = implementations(tmp_path, version="fs_tool")
+    (tmp_path / "a.txt").write_text("x")
+    assert "x" in tools["Bash"](command=f"cat {tmp_path}/a.txt")
+    tools["Bash"](command="cat /dev/null")

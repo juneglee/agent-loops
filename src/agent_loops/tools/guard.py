@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import re
 import shlex
 from pathlib import Path
@@ -137,6 +138,25 @@ def _programs(cmd: str) -> list[str]:
     return heads
 
 
+_ABSOLUTE_OK = ("/dev/null", "/bin/", "/usr/bin/", "/usr/local/bin/")
+
+
+_PATH_LIKE = re.compile(r"^/(?:[A-Za-z0-9._-]|$)")
+
+
+def _escapes(token: str, root: Path) -> bool:
+    for part in token.split("="):
+        if not _PATH_LIKE.match(part):
+            continue
+        if part.startswith(_ABSOLUTE_OK):
+            continue
+        real = os.path.realpath(part)
+        if real == str(root) or real.startswith(str(root) + "/"):
+            continue
+        return True
+    return False
+
+
 def _tokens(cmd: str) -> list[str]:
     try:
         return shlex.split(cmd, posix=True) if cmd else []
@@ -162,9 +182,7 @@ class Guard:
             if self.allowed_programs is not None and _DENY_SUBSTITUTION.search(cmd):
                 raise Blocked(f"blocked command pattern: {cmd}")
             for token in _tokens(cmd):
-                if token.startswith("~") or (
-                    token.startswith(_ROOTS) and not token.startswith(str(root))
-                ):
+                if token.startswith("~") or _escapes(token, root):
                     raise Blocked(f"path outside the workspace: {token}")
             if self.allowed_programs is None:
                 return
