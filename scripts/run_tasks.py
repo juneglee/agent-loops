@@ -70,8 +70,10 @@ def _trace_sink(path: Path):
 
 def _budget(kwargs: dict[str, Any], max_steps: int | None) -> dict[str, Any]:
     out = dict(kwargs)
-    if max_steps is not None and "max_steps" in out:
-        out["max_steps"] = max_steps
+    if max_steps is not None:
+        for key in ("max_steps", "max_rounds", "max_calls"):
+            if key in out:
+                out[key] = max_steps
     return out
 
 

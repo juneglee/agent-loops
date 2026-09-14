@@ -79,5 +79,10 @@ def test_run_dataset_can_override_the_step_budget(tmp_path):
     from scripts.run_tasks import _budget
 
     assert _budget({"max_steps": 10}, 30) == {"max_steps": 30}
-    assert _budget({"max_rounds": 5}, 30) == {"max_rounds": 5}
+    assert _budget({"max_rounds": 5}, 30) == {"max_rounds": 30}
+    assert _budget({"max_depth": 3, "max_calls": 30}, 40) == {
+        "max_depth": 3,
+        "max_calls": 40,
+    }
+    assert _budget({"max_replans": 1}, 30) == {"max_replans": 1}
     assert _budget({"max_steps": 10}, None) == {"max_steps": 10}
