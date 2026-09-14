@@ -14,6 +14,7 @@ from __future__ import annotations
 import fnmatch
 import re
 import subprocess
+import tempfile
 from collections.abc import Callable, Iterable
 from pathlib import Path
 from typing import Any
@@ -29,6 +30,15 @@ MAX_GREP_MATCHES = 200
 MAX_OUTPUT_CHARS = 30_000
 DEFAULT_BASH_TIMEOUT = 120.0
 MAX_BASH_TIMEOUT = 600.0
+
+
+_HOME: list[str] = []
+
+
+def _home() -> str:
+    if not _HOME:
+        _HOME.append(tempfile.mkdtemp(prefix="fs_tool_home_"))
+    return _HOME[0]
 
 
 def make(
@@ -137,7 +147,7 @@ def make(
         seconds = min(float(timeout) if timeout else bash_timeout, MAX_BASH_TIMEOUT)
         env = {
             "PATH": "/usr/bin:/bin:/usr/local/bin",
-            "HOME": str(root),
+            "HOME": _home(),
             "LANG": "C.UTF-8",
             "LC_ALL": "C.UTF-8",
         }

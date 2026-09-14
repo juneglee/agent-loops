@@ -213,3 +213,11 @@ def test_fs_tool_bash_still_blocks_escapes_and_destruction(tmp_path, cmd):
     tools = implementations(tmp_path, version="fs_tool")
     with pytest.raises(ToolError):
         tools["Bash"](command=cmd)
+
+
+def test_bash_home_is_outside_the_workspace_so_tool_caches_do_not_leak(tmp_path):
+    tools = implementations(tmp_path, version="fs_tool")
+    home = tools["Bash"](command="echo $HOME").strip()
+    assert home and not Path(home).resolve().is_relative_to(tmp_path.resolve())
+    tools["Bash"](command="python3 -c 'print(1)'")
+    assert not (tmp_path / "Library").exists()
