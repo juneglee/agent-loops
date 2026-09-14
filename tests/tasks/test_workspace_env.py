@@ -133,3 +133,17 @@ def test_state_records_symlinks_by_target_even_when_dangling(tmp_path):
     env.execute("Bash", {"command": "rm link_bad && ln -s other link_bad"})
     assert env.state()["link_bad"] != state["link_bad"]
     env.close()
+
+
+def test_fixture_mtimes_manifest_is_applied_to_the_workspace(tmp_path):
+    import json
+    import os
+
+    fixture = _fixture(tmp_path)
+    manifest = fixture.parent / f"{fixture.name}.mtimes.json"
+    manifest.write_text(json.dumps({"docs/a.md": 1_700_000_000}), encoding="utf-8")
+    env = WorkspaceEnv(fixture, tools_version="fs_tool")
+    assert int(os.stat(env.root / "docs" / "a.md").st_mtime) == 1_700_000_000
+    env.reset()
+    assert int(os.stat(env.root / "docs" / "a.md").st_mtime) == 1_700_000_000
+    env.close()

@@ -47,6 +47,16 @@ sys.exit(rc)
 """
 
 
+def _apply_mtimes(fixture_dir: Path, root: Path) -> None:
+    manifest = fixture_dir.parent / f"{fixture_dir.name}.mtimes.json"
+    if not manifest.is_file():
+        return
+    for rel, stamp in json.loads(manifest.read_text(encoding="utf-8")).items():
+        target = root / rel
+        if target.exists():
+            os.utime(target, (stamp, stamp))
+
+
 def _zip_digest(data: bytes) -> bytes | None:
     import io
     import zipfile
@@ -104,6 +114,7 @@ class WorkspaceEnv:
         self.root = self._tmp / "root"
         if self.fixture_dir is not None:
             shutil.copytree(self.fixture_dir, self.root)
+            _apply_mtimes(self.fixture_dir, self.root)
         else:
             self.root.mkdir()
         self.calls: list[dict[str, Any]] = []

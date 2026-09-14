@@ -4,3 +4,4 @@ Retrieved: 2026-09-08
 License: Apache-2.0 (see LICENSE in this directory)
 Modifications: none to descriptions, meta.json or verify.py.
 Workspaces: not stored in git. scripts/fetch_mcpmark_fixtures.py downloads each category archive from the stateUrl in meta.json into fixtures/<category>, checks its sha256 against the archives the measurements used, and drops __MACOSX and .DS_Store entries.
+File modification times: git does not keep them, so fixtures/<category>.mtimes.json records the archive entry times (read as UTC+8, the zone the verify scripts assume) and the workspace loader applies them on every copy.
