@@ -44,3 +44,12 @@ def test_plan_and_solve_records_parse_failure(scripted_llm, recording_env):
 
     assert trace.parse_ok is False
     assert trace.terminated_by == "parse_fail"
+
+
+def test_instruction_opens_with_the_papers_trigger_sentence():
+    from agent_loops.bench.prompts import LOOP_INSTRUCTIONS
+
+    assert LOOP_INSTRUCTIONS["plan_and_solve"].startswith(
+        "Let's first understand the problem and devise a plan to solve the problem. "
+        "Then, let's carry out the plan to solve the problem step by step."
+    )

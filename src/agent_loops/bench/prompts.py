@@ -29,7 +29,9 @@ LOOP_INSTRUCTIONS: dict[str, str] = {
         "  #E2 = toolB[arg=#E1]"
     ),
     "plan_and_solve": (
-        "First write the whole plan as a numbered list, then it is executed as written.\n"
+        "Let's first understand the problem and devise a plan to solve the problem. "
+        "Then, let's carry out the plan to solve the problem step by step.\n"
+        "Write the whole plan as a numbered list; it is then executed as written.\n"
         "Line format: `1. tool_name[arg=value]`\n"
         "Do not refer to earlier results; every step is independent."
     ),
