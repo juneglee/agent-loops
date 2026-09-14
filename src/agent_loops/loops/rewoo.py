@@ -128,10 +128,7 @@ def run(task: str, env: Any, llm: Any, history: list | None = None) -> Trace:
 
     solve_response = llm(
         messages=build_messages(
-            NAME,
-            task,
-            [{"role": "user", "content": build_solver_message(task, log)}],
-            prior=prior,
+            NAME, build_solver_message(task, log), bare=True, prior=prior
         ),
         want="text",
     )

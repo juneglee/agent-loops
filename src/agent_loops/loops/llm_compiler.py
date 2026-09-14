@@ -197,14 +197,11 @@ def run(
                 )
         scratchpad.extend(executed)
 
-        joiner_message = {
-            "role": "user",
-            "content": f"{_scratchpad(scratchpad)}\n\n{JOINER_INSTRUCTION}",
-        }
+        joiner_prompt = (
+            f"Request: {task}\n\n{_scratchpad(scratchpad)}\n\n{JOINER_INSTRUCTION}"
+        )
         verdict = llm(
-            messages=build_messages(
-                NAME, task, [*history, joiner_message], prior=prior
-            ),
+            messages=build_messages(NAME, joiner_prompt, bare=True, prior=prior),
             want="text",
         )
         trace.steps.append(Step(llm_response=verdict))

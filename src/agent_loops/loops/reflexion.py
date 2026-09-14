@@ -98,6 +98,11 @@ def _format_reflections(reflections: list[str]) -> str:
     )
 
 
+def _reflect_prompt(task: str, transcript: list[dict[str, Any]]) -> str:
+    trial = json.dumps(transcript, ensure_ascii=False, default=str)
+    return f"{_REFLECT_INSTRUCTION}\n\nPrevious trial:\nTask: {task}\n{trial}\n\nReflection:"
+
+
 def _action_key(response: dict[str, Any]) -> str:
     return json.dumps(calls_of(response), sort_keys=True, ensure_ascii=False)
 
@@ -191,13 +196,7 @@ def run(
         if trial < max_trials - 1:
             reflection = llm(
                 messages=build_messages(
-                    NAME,
-                    task,
-                    [
-                        {"role": "tool", "content": {"failed_trial": transcript}},
-                        {"role": "system", "content": _REFLECT_INSTRUCTION},
-                    ],
-                    prior=prior,
+                    NAME, _reflect_prompt(task, transcript), bare=True, prior=prior
                 ),
                 want="text",
             )
