@@ -52,6 +52,10 @@ Adaptations (declared, not in the paper or the reference code):
 Deliberately absent: weight updates, search/backtracking (LATS, DFSDT), intra-step
 retries. ``max_trials`` is extra compute that a one-trial loop does not have, so a
 fair comparison must budget at the runner level.
+
+Budget note: ``max_trials=3`` and ``max_steps=10`` are this repository's values (ALFWorld
+uses 10 trials and 49 steps, HotpotQA 5 trials and 6 steps). An empty model reply ends
+the run here, while the authors retry the call with a rising temperature.
 """
 
 from __future__ import annotations

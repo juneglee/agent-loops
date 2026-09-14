@@ -37,6 +37,9 @@ Adaptations, all deliberate:
     MINT's ``INVALID_INPUT_MESSAGE``.
 
 Not included (deliberate): replanning, decomposition, external verifiers.
+
+Budget note: ``max_steps=6`` matches neither MINT (5) nor M3ToolEval (10); MINT also
+caps solution proposals (``max_propose_solution``), which this loop does not.
 """
 
 from __future__ import annotations

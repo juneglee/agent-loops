@@ -41,6 +41,10 @@ Adaptations relative to the authors' code:
     replanner. A variable re-executed successfully by a replan is un-failed.
   - Zero-shot planner: the instruction lives in ``bench.prompts`` and the
     authors' few-shot planner examples are not used.
+
+Budget note: the authors' loop runs ``max_replans`` rounds in total and, with the
+configs' value of 1, never replans; this loop runs ``1 + max_replans`` rounds so that
+one replan is possible by default. Set ``max_replans=0`` to reproduce the authors' budget.
 """
 
 from __future__ import annotations

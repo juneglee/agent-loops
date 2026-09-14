@@ -3,7 +3,7 @@ https://github.com/langchain-ai/langgraph/blob/23961cff61a42b52525f3b20b4094d8d2
 
 The replanner format is taken from the tutorial: it sees the request, the
 original plan and the steps done so far, and answers with either a final
-response or a new plan; an empty plan ends the loop. The tutorial executes only
+response or a new plan. The tutorial executes only
 the first plan step through an inner ReAct agent and replans after each one,
 which is the same shape as plan_and_act. This loop is a deliberate variant:
 it executes the whole plan, then replans on the observations, filling the
@@ -11,6 +11,10 @@ middle of the replanning-frequency axis (none: plan_and_solve, rewoo; after the
 plan: here; on failure: adapt; every action: plan_and_act). Plans use the tool
 syntax `1. tool[arg=value]` instead of natural-language steps, and the budget is
 `max_rounds` (rounds) rather than the tutorial's recursion limit.
+
+Termination note: the tutorial ends only when the replanner returns a ``Response``;
+ending on an empty plan is this loop's rule, not the tutorial's. The replanner here
+sees every earlier plan in the history, the tutorial passes only the latest plan.
 """
 
 from __future__ import annotations
