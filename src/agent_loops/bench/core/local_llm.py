@@ -122,6 +122,10 @@ def _observation_text(content: Any) -> str:
         if content.get("ok"):
             return _as_text(content.get("output", ""))
         return f"Error: {content.get('error') or 'tool failed'}"
+    if isinstance(content, dict):
+        return "\n".join(f"{k}: {_observation_text(v)}" for k, v in content.items())
+    if isinstance(content, list):
+        return "\n".join(f"- {_observation_text(v)}" for v in content)
     return _as_text(content)
 
 
@@ -193,7 +197,7 @@ def _serialize(
             and not content.get("tool_calls")
         ):
             content = str(content.get("text") or "")
-        text = _as_text(content)
+        text = _observation_text(content) if plain_observations else _as_text(content)
         if role == "tool":
             role, text = "user", f"[observation] {text}"
         out.append({"role": role, "content": text})

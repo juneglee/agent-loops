@@ -235,3 +235,22 @@ def test_observations_stay_json_by_default():
     ]
     out = _serialize(messages)
     assert out[-1]["content"] == '{"ok": true, "error": null, "output": "line one"}'
+
+
+def test_plain_observations_render_nested_tool_results_without_json():
+    messages = [
+        {"role": "user", "content": "do it"},
+        {"role": "assistant", "content": "1. Read[file_path=a.txt]"},
+        {
+            "role": "tool",
+            "content": {
+                "step": {"tool": "Read", "arguments": {"file_path": "a.txt"}},
+                "result": {"ok": True, "error": None, "output": "line one"},
+            },
+        },
+    ]
+    out = _serialize(messages, plain_observations=True)
+    text = out[-1]["content"]
+    assert out[-1]["role"] == "user"
+    assert '"ok"' not in text and "{" not in text
+    assert "Read" in text and "a.txt" in text and "line one" in text
