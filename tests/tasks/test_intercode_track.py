@@ -34,3 +34,24 @@ def test_every_gold_command_produces_a_state_change():
         )
         untouched = expected_state(DATA / case["fixture"], [[]], [], "fs_tool")
         assert state != untouched, case["id"]
+
+
+def test_fixtures_are_rebuilt_on_every_load_so_file_ages_stay_relative(tmp_path):
+    build_fixtures(DATA, tmp_path)
+    marker = tmp_path / "fs_1" / "testbed" / "stale.txt"
+    marker.write_text("left over from an older build")
+
+    build_fixtures(DATA, tmp_path)
+
+    assert not marker.exists()
+
+
+def test_archives_in_fixtures_carry_workspace_relative_member_names(tmp_path):
+    import subprocess
+
+    build_fixtures(DATA, tmp_path)
+    archive = tmp_path / "fs_3" / "workspace" / "archive.tar.gz"
+    members = subprocess.run(
+        ["tar", "tzf", str(archive)], capture_output=True, text=True, check=True
+    ).stdout.split()
+    assert members and all(m.startswith("workspace/") for m in members)

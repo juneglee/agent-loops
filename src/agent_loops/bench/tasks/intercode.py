@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -16,14 +17,13 @@ def is_intercode_dir(path: Path | str) -> bool:
     return (path / "tasks.json").is_file() and (path / "setup").is_dir()
 
 
-def _portable(script: str, root_name: str, target: Path) -> str:
+def _portable(script: str, root_name: str) -> str:
     lines = []
     for line in script.splitlines():
         if line.startswith("rm -rf"):
             continue
-        rooted = str(target / root_name)
-        line = line.replace(f"/{root_name}", rooted)
-        if _ABSOLUTE.search(line.replace(rooted, root_name)):
+        line = line.replace(f"/{root_name}", root_name)
+        if _ABSOLUTE.search(line):
             continue
         lines.append(line)
     return "\n".join(lines) + "\n"
@@ -40,10 +40,9 @@ def build_fixtures(path: Path | str, out: Path | str | None = None) -> list[str]
             continue
         target = out / name
         if target.is_dir():
-            built.append(name)
-            continue
+            shutil.rmtree(target)
         target.mkdir(parents=True, exist_ok=True)
-        text = _portable(script.read_text(encoding="utf-8"), root_name, target)
+        text = _portable(script.read_text(encoding="utf-8"), root_name)
         subprocess.run(
             ["/bin/bash", "-c", text],
             cwd=target,
