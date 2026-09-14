@@ -11,7 +11,7 @@ def test_intercode_directory_is_recognised_and_loads_single_step_cases():
     assert is_intercode_dir(DATA)
     cases = load_tasks(DATA)
 
-    assert len(cases) == 26
+    assert len(cases) == 20
     assert all(c["cell"] == "single_turn_single_step" for c in cases)
     assert all(c["gt_calls"][0][0]["name"] == "Bash" for c in cases)
     assert all("/testbed" not in c["turns"][0] for c in cases)

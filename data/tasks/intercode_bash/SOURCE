@@ -2,5 +2,12 @@ InterCode-Bash (NL2Bash) file-system tasks
 Source: https://github.com/princeton-nlp/intercode (data/nl2bash/nl2bash_fs_{1,2,3}.json, docker/bash_scripts/setup_nl2b_fs_{1,2,3}.sh)
 Retrieved: 2026-09-10
 License: MIT (as stated in the upstream README)
-Selection: the 55 tasks whose gold command changes the file system were executed in a workspace copy on macOS; the 26 that run inside the workspace and change its state are kept. Read-only tasks and tasks that touch paths outside the workspace or need GNU-only options are left out.
+Selection: the 55 tasks whose gold command changes the file system were executed in a workspace copy on macOS; the 26 that run inside the workspace and change its state were kept, then six were dropped after inspecting the gold command against the query on the kept workspaces, leaving 20:
+- fs3 task 59: the gold makes a hard link while the query asks for a symbolic link
+- fs2_005: query says recursively but the gold removes only the top-level *.txt files
+- fs1_011: the gold relies on the compress program, which macOS lacks, so its expected state has no compressed files
+- fs2_039: the gold archives the whole folder1 directory (via the directory entry) instead of only files modified in the last 60 days
+- fs2_045: query says copy files except those containing text, the gold copies only the files containing text
+- fs3_052: query asks for a file name ending in a carriage return, the gold's xargs strips it
+Read-only tasks and tasks that touch paths outside the workspace or need GNU-only options are left out.
 Modifications: the absolute roots /testbed, /system and /workspace are written as relative paths (testbed, system, workspace) in the query and in the gold command; the setup scripts are unchanged and are run by the loader to build the workspaces, so file timestamps set with touch -t are reproduced on every checkout.

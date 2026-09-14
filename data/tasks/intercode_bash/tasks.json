@@ -1,29 +1,5 @@
 [
  {
-  "id": "intercode/fs1_011",
-  "fixture": "fixtures/fs_1",
-  "cell": "single_turn_single_step",
-  "turns": [
-   "Compress in parallel regular files in the testbed directory tree that were last modified more than 7 days ago"
-  ],
-  "gt_calls": [
-   [
-    {
-     "name": "Bash",
-     "arguments": {
-      "command": "find testbed -type f  -mtime +7 | tee compressedP.list | xargs -I{} -P10 compress {} &"
-     }
-    }
-   ]
-  ],
-  "expect": {},
-  "tags": [
-   "intercode",
-   "state_change"
-  ],
-  "source": "intercode"
- },
- {
   "id": "intercode/fs1_015",
   "fixture": "fixtures/fs_1",
   "cell": "single_turn_single_step",
@@ -108,30 +84,6 @@
      "name": "Bash",
      "arguments": {
       "command": "find testbed/dir3/subdir1/subsubdir1/tmp -type f -mtime +2 -print0 | xargs -0 rm -f"
-     }
-    }
-   ]
-  ],
-  "expect": {},
-  "tags": [
-   "intercode",
-   "state_change"
-  ],
-  "source": "intercode"
- },
- {
-  "id": "intercode/fs2_005",
-  "fixture": "fixtures/fs_2",
-  "cell": "single_turn_single_step",
-  "turns": [
-   "Recursively remove all \"*.txt\" files in the 'system' folder and answer \"y\" to any prompt"
-  ],
-  "gt_calls": [
-   [
-    {
-     "name": "Bash",
-     "arguments": {
-      "command": "yes y | rm -r system/*.txt"
      }
     }
    ]
@@ -432,30 +384,6 @@
   "source": "intercode"
  },
  {
-  "id": "intercode/fs2_039",
-  "fixture": "fixtures/fs_2",
-  "cell": "single_turn_single_step",
-  "turns": [
-   "archive all files in system/folder1 directory modified in the last 60 days to \"/mytarfile.tgz\""
-  ],
-  "gt_calls": [
-   [
-    {
-     "name": "Bash",
-     "arguments": {
-      "command": "tar czvf mytarfile.tgz `find system/folder1 -mtime -60`"
-     }
-    }
-   ]
-  ],
-  "expect": {},
-  "tags": [
-   "intercode",
-   "state_change"
-  ],
-  "source": "intercode"
- },
- {
   "id": "intercode/fs2_041",
   "fixture": "fixtures/fs_2",
   "cell": "single_turn_single_step",
@@ -468,30 +396,6 @@
      "name": "Bash",
      "arguments": {
       "command": "find system -type f -mtime +31 -print0 | xargs -0 -r rm -f"
-     }
-    }
-   ]
-  ],
-  "expect": {},
-  "tags": [
-   "intercode",
-   "state_change"
-  ],
-  "source": "intercode"
- },
- {
-  "id": "intercode/fs2_045",
-  "fixture": "fixtures/fs_2",
-  "cell": "single_turn_single_step",
-  "turns": [
-   "Copy all files in the system directory except those containing 'text' to 'system/folder3/backup_dbg/backup'."
-  ],
-  "gt_calls": [
-   [
-    {
-     "name": "Bash",
-     "arguments": {
-      "command": "find system -maxdepth 1 -type f -name '*text*' -exec cp {} system/folder3/backup_dbg/backup \\;"
      }
     }
    ]
@@ -552,30 +456,6 @@
   "source": "intercode"
  },
  {
-  "id": "intercode/fs3_052",
-  "fixture": "fixtures/fs_3",
-  "cell": "single_turn_single_step",
-  "turns": [
-   "Create an empty file \"Icon\" with a carriage return character in the end of its name."
-  ],
-  "gt_calls": [
-   [
-    {
-     "name": "Bash",
-     "arguments": {
-      "command": "echo $'Icon\\r' | xargs touch"
-     }
-    }
-   ]
-  ],
-  "expect": {},
-  "tags": [
-   "intercode",
-   "state_change"
-  ],
-  "source": "intercode"
- },
- {
   "id": "intercode/fs3_057",
   "fixture": "fixtures/fs_3",
   "cell": "single_turn_single_step",
@@ -588,30 +468,6 @@
      "name": "Bash",
      "arguments": {
       "command": "find workspace -name '*.gz' -print0 | xargs -0 gunzip"
-     }
-    }
-   ]
-  ],
-  "expect": {},
-  "tags": [
-   "intercode",
-   "state_change"
-  ],
-  "source": "intercode"
- },
- {
-  "id": "intercode/fs3_059",
-  "fixture": "fixtures/fs_3",
-  "cell": "single_turn_single_step",
-  "turns": [
-   "Create a symbolic link to \"workspace/dir1/terminate.txt\" named \"workspace/test\""
-  ],
-  "gt_calls": [
-   [
-    {
-     "name": "Bash",
-     "arguments": {
-      "command": "ln workspace/dir1/terminate.txt workspace/test"
      }
     }
    ]
