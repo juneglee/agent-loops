@@ -1,3 +1,5 @@
+import pytest
+
 from agent_loops.bench.core.llm import build_payload, call, parse_response
 
 
@@ -266,3 +268,35 @@ def test_local_llm_forwards_max_tokens_and_timeout(monkeypatch):
     )
 
     assert seen["timeout"] == 300 and seen["max_tokens"] == 4096
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        '{"name": "ls", "arguments": {"path": "."}}',
+        '<|tool_call>call:Glob{pattern: "*", path: "test"}<tool_call|>',
+        '<|tool_call>call:Bash{command:<|"|>ls -R test<|"|>}<tool_call|>',
+        'call:Write{content: "hello", file_path: "a.txt"}',
+        '```tool_call\n{"name": "Read"}\n```',
+    ],
+)
+def test_detects_quiet_failure_for_tool_calls_written_as_text(content):
+    out = parse_response({"choices": [{"message": {"content": content}}]})
+
+    assert out["tool_calls"] is None
+    assert out["quiet_failure"] is True
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "Final: renamed the largest file",
+        "I will call the tool that lists the directory next.",
+        '1. Bash[command="ls -l"]',
+        "The recall: rate is high",
+    ],
+)
+def test_plain_text_is_not_a_quiet_failure(content):
+    out = parse_response({"choices": [{"message": {"content": content}}]})
+
+    assert out["quiet_failure"] is False

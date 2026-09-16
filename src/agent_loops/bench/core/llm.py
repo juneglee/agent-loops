@@ -7,7 +7,15 @@ from typing import Any
 
 DEFAULT_BASE_URL = "http://127.0.0.1:8080/v1"
 
-_LOOKS_LIKE_CALL = re.compile(r'"(name|function|tool_name)"\s*:', re.IGNORECASE)
+_LOOKS_LIKE_CALL = re.compile(
+    r"""
+      "(?:name|function|tool_name)"\s*:   # a tool call written as JSON
+    | <\|?(?:tool_call|function_call)     # the chat template's own markers as text
+    | (?:^|\s)call:[A-Za-z_]\w*\s*\{     # call:Tool{...}
+    | ```\s*(?:tool_call|function_call)   # a fenced tool call block
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
 
 TRANSPORT_ATTEMPTS = 3
 TRANSPORT_BACKOFF_SECONDS = 0.5
