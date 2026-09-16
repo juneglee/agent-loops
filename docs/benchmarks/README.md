@@ -6,6 +6,8 @@
 | 문서 | 과제 | 대상 | 상태 |
 |---|---|---|---|
 | [Result_BFCL](Result_BFCL.md) | BFCL v4 multi_turn_base 파일 관리 26 | 코어 12 · 조합 9 · 하네스 2 | 완료 |
+| [Result_MCPMark](Result_MCPMark.md) | MCPMark Filesystem 파일 관리 21 | 코어 12 | 1차 완료, 잠정 |
+| [Result_InterCode](Result_InterCode.md) | InterCode-Bash 파일시스템 20 | 코어 12 | 1차 완료, 잠정 |
 
 ## 읽는 법
 
