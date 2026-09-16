@@ -4,6 +4,7 @@ import pytest
 
 from agent_loops.tools import TOOL_VERSIONS, Toolset, implementations, schemas
 from agent_loops.tools.fs import ToolError
+from agent_loops.tools.fs_tool import sandbox_available
 
 FIXTURE_PDF = Path(__file__).resolve().parents[1] / "fixtures" / "report.pdf"
 NAMES = ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
@@ -117,8 +118,8 @@ def test_bash_runs_inside_the_workspace_and_reports_exit_codes(tmp_path):
     assert (tmp_path / "archive" / "b.txt").exists()
     with pytest.raises(ToolError, match="Exit code"):
         t.call("Bash", {"command": "ls missing_dir"})
-    with pytest.raises(ToolError, match="blocked"):
-        t.call("Bash", {"command": "cat /etc/passwd"})
+    with pytest.raises(ToolError, match="null byte"):
+        t.call("Bash", {"command": "echo a\x00b"})
 
 
 def test_bash_honours_the_timeout_argument(tmp_path):
@@ -205,6 +206,9 @@ def test_fs_tool_bash_does_not_restrict_programs(tmp_path, cmd):
     tools["Bash"](command=cmd)
 
 
+@pytest.mark.skipif(
+    sandbox_available(), reason="the OS sandbox replaces the path guard"
+)
 @pytest.mark.parametrize(
     "cmd",
     ["rm -rf /", "cat /etc/passwd", "cd .. && ls", "ls ~", "echo x > /dev/sda"],
@@ -225,10 +229,13 @@ def test_bash_home_is_outside_the_workspace_so_tool_caches_do_not_leak(tmp_path)
 
 def test_bash_rejects_a_command_containing_a_null_byte(tmp_path):
     tools = implementations(tmp_path, version="fs_tool")
-    with pytest.raises(ToolError, match="null"):
+    with pytest.raises(ToolError, match="null byte"):
         tools["Bash"](command="echo a\x00b")
 
 
+@pytest.mark.skipif(
+    sandbox_available(), reason="the OS sandbox replaces the path guard"
+)
 @pytest.mark.parametrize(
     "cmd",
     [
@@ -246,6 +253,9 @@ def test_fs_tool_bash_blocks_any_absolute_path_outside_the_workspace(tmp_path, c
         tools["Bash"](command=cmd)
 
 
+@pytest.mark.skipif(
+    sandbox_available(), reason="the OS sandbox replaces the path guard"
+)
 def test_fs_tool_bash_allows_absolute_paths_inside_the_workspace_and_dev_null(
     tmp_path,
 ):

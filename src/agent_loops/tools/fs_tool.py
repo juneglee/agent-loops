@@ -3,7 +3,8 @@ Read(file_path, offset, limit)      raw file content; line numbers only with off
 Write(file_path, content)           create or overwrite a file, parent directories are created
 Edit(file_path, old_string, new_string, replace_all)
                                     replace one unique string; the file must have been Read first
-Bash(command, timeout)              run an allow-listed shell command in the workspace
+Bash(command, timeout)              run a shell command in the workspace; on macOS the OS sandbox,
+                                    not a string check, keeps writes inside it
 Glob(pattern, path)                 matching paths sorted by modification time
 Grep(pattern, path, glob, output_mode)
                                     regex search; output_mode is content, files_with_matches or count
@@ -12,6 +13,7 @@ Grep(pattern, path, glob, output_mode)
 from __future__ import annotations
 
 import fnmatch
+import os
 import re
 import subprocess
 import tempfile
@@ -30,6 +32,32 @@ MAX_GREP_MATCHES = 200
 MAX_OUTPUT_CHARS = 30_000
 DEFAULT_BASH_TIMEOUT = 120.0
 MAX_BASH_TIMEOUT = 600.0
+
+
+SANDBOX = Path("/usr/bin/sandbox-exec")
+_WRITABLE_DEVICES = ("/dev/null", "/dev/stdout", "/dev/stderr", "/dev/dtracehelper")
+
+
+def sandbox_available() -> bool:
+    """The operating system, not a string check, keeps writes inside the workspace."""
+    return SANDBOX.exists()
+
+
+def _sandbox_profile(root: Path) -> str:
+    devices = "".join(f'\n  (literal "{d}")' for d in _WRITABLE_DEVICES)
+    return (
+        "(version 1)\n"
+        "(allow default)\n"
+        "(deny file-write*)\n"
+        f'(allow file-write* (subpath "{root}"){devices})\n'
+    )
+
+
+def _shell_argv(command: str, root: Path) -> list[str]:
+    if not sandbox_available():
+        return ["/bin/bash", "-c", command]
+    profile = _sandbox_profile(Path(os.path.realpath(root)))
+    return [str(SANDBOX), "-p", profile, "/bin/bash", "-c", command]
 
 
 _HOME: list[str] = []
@@ -141,11 +169,12 @@ def make(
 
     def bash(command: str, timeout: float | None = None) -> str:
         if "\x00" in command:
-            raise ToolError("Command blocked: it contains a null byte")
-        try:
-            guard.check("bash", {"command": command}, root)
-        except Blocked as exc:
-            raise ToolError(f"Command blocked: {exc}") from exc
+            raise ToolError("Command contains a null byte and cannot be run")
+        if not sandbox_available():
+            try:
+                guard.check("bash", {"command": command}, root)
+            except Blocked as exc:
+                raise ToolError(f"Command blocked: {exc}") from exc
         seconds = min(float(timeout) if timeout else bash_timeout, MAX_BASH_TIMEOUT)
         env = {
             "PATH": "/usr/bin:/bin:/usr/local/bin",
@@ -155,7 +184,7 @@ def make(
         }
         try:
             done = subprocess.run(
-                ["/bin/bash", "-c", command],
+                _shell_argv(command, root),
                 cwd=root,
                 env=env,
                 timeout=seconds,
