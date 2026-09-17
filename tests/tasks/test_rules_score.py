@@ -101,3 +101,12 @@ def test_end_forbid_order_args_and_action_budget():
     )[0]
     assert not score_rules({"max_actions": 1}, *s, [t])[0]
     assert not score_rules({"min_actions": 3}, *s, [t])[0]
+
+
+def test_answer_contains_checks_the_final_text():
+    t = _trace([("Read", {"file_path": "settings.txt"})], final_text="port is 8080")
+    initial = {"settings.txt": "port=8080\n"}
+    ok, _ = score_rules({"answer_contains": ["8080"]}, initial, initial, [t])
+    assert ok
+    ok, reason = score_rules({"answer_contains": ["9090"]}, initial, initial, [t])
+    assert not ok and "9090" in reason
