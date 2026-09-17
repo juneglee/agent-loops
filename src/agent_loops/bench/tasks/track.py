@@ -61,4 +61,4 @@ class TaskTrack:
     ) -> tuple[bool, str | None]:
         scored = truncated(case, len(turn_traces))
         answer = final_answer(turn_traces[-1]) if turn_traces else ""
-        return score(scored, env, self.base, answer)
+        return score(scored, env, self.base, answer, turn_traces)

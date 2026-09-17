@@ -81,7 +81,7 @@ def validate(case: dict[str, Any], base: Path) -> None:
     if (
         "cell" in case
         and case["cell"] != derived
-        and "verify" not in (case.get("expect") or {})
+        and not ({"verify", "rules"} & set(case.get("expect") or {}))
     ):
         _fail(
             case,

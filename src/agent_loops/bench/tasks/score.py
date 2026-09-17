@@ -7,6 +7,7 @@ from typing import Any
 from agent_loops.bench.tasks.env import WorkspaceEnv
 from agent_loops.bench.tasks.format import fixture_dir
 from agent_loops.bench.tasks.mcpmark import run_verifier
+from agent_loops.bench.tasks.rules import score_rules
 from agent_loops.tools import TOOLS_VERSION
 
 
@@ -59,11 +60,23 @@ def compare(expected: dict[str, str], actual: dict[str, str]) -> list[str]:
 
 
 def score(
-    case: dict[str, Any], env: WorkspaceEnv, base: Path | str, answer: str
+    case: dict[str, Any],
+    env: WorkspaceEnv,
+    base: Path | str,
+    answer: str,
+    traces: list[Any] | None = None,
 ) -> tuple[bool, str | None]:
     expect = case.get("expect", {}) or {}
     if "verify" in expect:
         return run_verifier(Path(base) / expect["verify"], env.root)
+    if "rules" in expect:
+        initial = expected_state(
+            fixture_dir(case, base),
+            [[]],
+            [],
+            getattr(env, "tools_version", TOOLS_VERSION),
+        )
+        return score_rules(expect["rules"], initial, env.state(), traces or [])
     ignore = list(expect.get("ignore", []))
     expected = expected_state(
         fixture_dir(case, base),
