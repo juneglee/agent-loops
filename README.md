@@ -80,6 +80,8 @@ python examples/demo.py
 | BFCL multi_turn 파일 관리 26과제, 12루프·조합·하네스 | 완료 | [문서](docs/benchmarks/Result_BFCL.md) |
 | MCPMark Filesystem 파일 관리 21과제, 12루프 | 1차 완료, 잠정 | [문서](docs/benchmarks/Result_MCPMark.md) |
 | InterCode-Bash 파일시스템 20과제, 12루프 | 1차 완료, 잠정 | [문서](docs/benchmarks/Result_InterCode.md) |
+| 위 41과제 실패 분석 279건 | 완료 | [문서](docs/benchmarks/Analysis_FileManagement.md) |
+| 한국어 실사용 요청 300건(단일 250, 멀티턴 50), 상위 7루프 | 준비 중 | |
 
 ## 환경
 

@@ -56,6 +56,7 @@
 - 여러 파일을 순서대로 다뤄야 하는 과제라 관측을 보고 다음 행동을 정하는 루프(`react`·`codeact`·`dfsdt`·`plan_and_execute`·`reflexion`)만 5건 이상 통과했다. 계획을 한 번에 고정하는 루프는 4건 이하다.
 - `codeact` 의 시간은 스텝을 다 쓰며 코드 실행을 반복한 소수 케이스가 만든 값이다. 밤사이 머신 수면이 섞인 케이스가 있어 `codeact`·`plan_and_act` 의 시간은 상한으로만 읽는다.
 - `plan_and_act` 는 Executor 가 툴 호출을 텍스트로 내는 형식 오류(parse_fail 11)로 절반이 조기 종료됐다.
+- 실패 패턴 분류와 루프 간 비교는 InterCode 와 합쳐 [Analysis_FileManagement](Analysis_FileManagement.md) 에 있다.
 
 ## 유보
 

@@ -39,6 +39,7 @@
 - 명령 한 번으로 끝나는 과제라 루프 간 차이가 작다(11~17). `single_call` 도 13건을 통과한다.
 - 차이는 첫 명령이 틀렸을 때 관측을 보고 고치는지에서 난다. 과제 문장의 "test directory" 를 `test/` 폴더로 읽는 오해가 대표적이고, `react` 는 `ls -F` 로 실제 위치를 확인해 회복했지만 `plan_and_solve`·`rewoo` 는 같은 명령을 반복하다 끝났다.
 - 통과에 필요한 툴 실행이 1~2회라 계획·분해·반성에 쓰는 호출은 그대로 비용이다. `plan_and_act` 는 형식 오류(parse_fail 7)로 가장 낮다.
+- 실패 패턴 분류와 루프 간 비교는 MCPMark 와 합쳐 [Analysis_FileManagement](Analysis_FileManagement.md) 에 있다.
 
 ## 유보
 
