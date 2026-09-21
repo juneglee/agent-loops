@@ -1,5 +1,4 @@
 import subprocess
-from pathlib import Path
 
 import pytest
 
@@ -66,4 +65,15 @@ def test_the_sandbox_profile_names_the_workspace_only(tmp_path):
     assert f'(subpath "{tmp_path.resolve()}")' in profile
     assert "(deny file-write*)" in profile
     assert subprocess.run(["/usr/bin/true"], check=False).returncode == 0
-    assert Path("/usr/bin/sandbox-exec").exists()
+
+
+def test_the_shell_is_wrapped_by_whichever_isolation_the_platform_has(tmp_path):
+    from agent_loops.tools.fs_tool import BWRAP, SANDBOX, _shell_argv
+
+    argv = _shell_argv("echo hi", tmp_path)
+    assert argv[-3:] == ["/bin/bash", "-c", "echo hi"]
+    if SANDBOX.exists():
+        assert argv[0] == str(SANDBOX) and argv[1] == "-p"
+    else:
+        assert argv[0] == str(BWRAP)
+        assert "--ro-bind" in argv and str(tmp_path.resolve()) in argv

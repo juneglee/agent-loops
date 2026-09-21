@@ -35,12 +35,13 @@ MAX_BASH_TIMEOUT = 600.0
 
 
 SANDBOX = Path("/usr/bin/sandbox-exec")
+BWRAP = Path(os.environ.get("AGENT_LOOPS_BWRAP", "/usr/bin/bwrap"))
 _WRITABLE_DEVICES = ("/dev/null", "/dev/stdout", "/dev/stderr", "/dev/dtracehelper")
 
 
 def sandbox_available() -> bool:
     """The operating system, not a string check, keeps writes inside the workspace."""
-    return SANDBOX.exists()
+    return SANDBOX.exists() or BWRAP.exists()
 
 
 def _sandbox_profile(root: Path) -> str:
@@ -53,11 +54,38 @@ def _sandbox_profile(root: Path) -> str:
     )
 
 
+def _bwrap_argv(root: Path, home: str) -> list[str]:
+    return [
+        str(BWRAP),
+        "--ro-bind",
+        "/",
+        "/",
+        "--dev",
+        "/dev",
+        "--proc",
+        "/proc",
+        "--tmpfs",
+        "/tmp",
+        "--bind",
+        str(root),
+        str(root),
+        "--bind",
+        home,
+        home,
+        "--unshare-pid",
+        "--die-with-parent",
+        "--chdir",
+        str(root),
+    ]
+
+
 def _shell_argv(command: str, root: Path) -> list[str]:
-    if not sandbox_available():
-        return ["/bin/bash", "-c", command]
-    profile = _sandbox_profile(Path(os.path.realpath(root)))
-    return [str(SANDBOX), "-p", profile, "/bin/bash", "-c", command]
+    real = Path(os.path.realpath(root))
+    if SANDBOX.exists():
+        return [str(SANDBOX), "-p", _sandbox_profile(real), "/bin/bash", "-c", command]
+    if BWRAP.exists():
+        return [*_bwrap_argv(real, _home()), "/bin/bash", "-c", command]
+    return ["/bin/bash", "-c", command]
 
 
 _HOME: list[str] = []
