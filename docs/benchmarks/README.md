@@ -10,6 +10,8 @@
 | [Result_MCPMark](Result_MCPMark.md) | MCPMark Filesystem 파일 관리 21 | 코어 12 | 1차 완료, 잠정 |
 | [Result_InterCode](Result_InterCode.md) | InterCode-Bash 파일시스템 20 | 코어 12 | 1차 완료, 잠정 |
 | [Analysis_FileManagement](Analysis_FileManagement.md) | 위 두 세트 합산 실패 분석 279건 | 코어 12 | 완료 |
+| [Result_KOFM](Result_KOFM.md) | 한국어 파일 관리 요청 300 (단일 250 · 멀티턴 50, 비공개 데이터) | 코어 7 | 완료, 2,100건 전건 판정 |
+| [Analysis_KOFM](Analysis_KOFM.md) | 위 300건 실패 분석 1,085건 | 코어 7 | 완료 |
 
 ## 읽는 법
 
