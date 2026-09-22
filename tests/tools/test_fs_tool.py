@@ -263,3 +263,15 @@ def test_fs_tool_bash_allows_absolute_paths_inside_the_workspace_and_dev_null(
     (tmp_path / "a.txt").write_text("x")
     assert "x" in tools["Bash"](command=f"cat {tmp_path}/a.txt")
     tools["Bash"](command="cat /dev/null")
+
+
+def test_tool_internal_errors_become_tool_errors(tmp_path):
+    t = _ws(tmp_path)
+    (tmp_path / "broken.pdf").write_bytes(b"%PDF-1.4 truncated")
+    with pytest.raises(ToolError, match="Invalid glob pattern"):
+        t.call("Glob", {"pattern": "**.md"})
+    with pytest.raises(ToolError):
+        t.call("Read", {"file_path": "broken.pdf"})
+    (tmp_path / "photo.jpg").write_bytes(b"x")
+    with pytest.raises(ToolError, match="FileExistsError|NotADirectoryError"):
+        t.call("Write", {"file_path": "photo.jpg/new.txt", "content": "x"})

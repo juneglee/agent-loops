@@ -237,7 +237,10 @@ def make(
         base = _guarded(root, path or ".")
         if not base.is_dir():
             raise ToolError(f"Path is not a directory: {path}")
-        matches = [p for p in base.glob(pattern) if p.is_file()]
+        try:
+            matches = [p for p in base.glob(pattern) if p.is_file()]
+        except ValueError as exc:
+            raise ToolError(f"Invalid glob pattern {pattern!r}: {exc}") from exc
         if not matches:
             return "No files found"
         matches.sort(key=lambda p: p.stat().st_mtime, reverse=True)

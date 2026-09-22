@@ -77,5 +77,9 @@ class Toolset:
             raise fs.ToolError(f"blocked before execution: {exc}") from exc
         try:
             return fn(**arguments)
+        except fs.ToolError:
+            raise
         except TypeError as exc:
             raise fs.ToolError(f"argument error: {exc}") from exc
+        except Exception as exc:
+            raise fs.ToolError(f"{type(exc).__name__}: {exc}") from exc
